@@ -1,4 +1,10 @@
 # botR2
 Proyecto final WTPC, Robot 2
 
-NABM's EDIT
+main.py (Everyone)
+
+bot.py  (Flor y Cami)
+
+maze.py (Christian & Natha)
+
+vis.py 	(Facundo)
