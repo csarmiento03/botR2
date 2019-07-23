@@ -1,26 +1,12 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+#  maze.py
+
 import numpy as np
 import random
-# import cell
+import cell
 
-class Cell():
-	"""
-	Clase mínima para testeo!
-	"""
-	def __init__(self,pos,walls):
-		self.pos = pos
-		self.wallE = True
-		self.wallN = True
-		self.wallW = True
-		self.wallS = True
-		self.start = False
-		self.end = False
 
-	def __str__(self):
-		args = (self.pos, int(self.wallE), int(self.wallN), int(self.wallW), int(self.wallS))
-		txt = "{}\tE:{}\tN:{}\tW:{}\tS:{}".format(*args)
-		if self.start: txt += "\tSTART!"
-		if self.end: txt += "\tEND!"
-		return txt
 
 class Maze():
 	"""
@@ -127,7 +113,7 @@ class BacktrackingMaze(Maze):
 
 	def chooseNew(self,cell):
 		"""
-		Elige una nueva celda vecina al azar y la devuelve
+		Elige una nueva celda vecina al azar y la devuelve.
 		"""
 		pass
 
