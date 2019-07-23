@@ -15,19 +15,17 @@ class Visualizer(object):
 
     """
 
-    def __init__(self, cellSize, mediaFilename):
+    def __init__(self, maze, cellSize, mediaFilename):
         self.maze = maze
-        self.cellSize = cellSnumRowsize
-        self.height = maze.numRows * cellSize
-        self.width = maze.numCols * cellSize
+        self.cellSize = cellSize
+        self.height = (maze.getRowCol())[0] * cellSize
+        self.width = (maze.getRowCol())[1] * cellSize
         self.ax = None
-        self.mediaFilename = mediaFilename
 
-    def setMediaFilename(self, filename, mazeFilename):
+    def setMediaFilename(self, filename):
         """Setea el atributo mediaFilename
             Argumentos:
                 + filename (string): El nombre para los archivos y graficos
-                + mazeFilename (string): Nombre del archivo que tiene guardada la matriz del laberinto
         """
         self.mediaFilename = filename
 
@@ -35,7 +33,7 @@ class Visualizer(object):
         """Grafica el laberinto pelado"""
 
         # Crea la figura y el estilo de los ejes
-        fig = self.configurePlot()
+        tfig = self.configurePlot()
 
         # Graficamos las paredes
         self.plotWalls()
@@ -47,36 +45,78 @@ class Visualizer(object):
 
 
     def plotWalls(self):
-        """ Plots the walls of a maze. This is used when generating the maze image"""
-        for i in range(self.maze.num_rows):
-            for j in range(self.maze.num_cols):
-                if self.maze.initial_grid[i][j].is_entry_exit == "entry":
-                    self.ax.text(j*self.cell_size, i*self.cell_size, "START", fontsize=7, weight="bold")
-                elif self.maze.initial_grid[i][j].is_entry_exit == "exit":
-                    self.ax.text(j*self.cell_size, i*self.cell_size, "END", fontsize=7, weight="bold")
-                if self.maze.initial_grid[i][j].walls["top"]:
-                    self.ax.plot([j*self.cell_size, (j+1)*self.cell_size],
-                                 [i*self.cell_size, i*self.cell_size], color="k")
-                if self.maze.initial_grid[i][j].walls["right"]:
-                    self.ax.plot([(j+1)*self.cell_size, (j+1)*self.cell_size],
-                                 [i*self.cell_size, (i+1)*self.cell_size], color="k")
-                if self.maze.initial_grid[i][j].walls["bottom"]:
-                    self.ax.plot([(j+1)*self.cell_size, j*self.cell_size],
-                                 [(i+1)*self.cell_size, (i+1)*self.cell_size], color="k")
-                if self.maze.initial_grid[i][j].walls["left"]:
-                    self.ax.plot([j*self.cell_size, j*self.cell_size],
-                                 [(i+1)*self.cell_size, i*self.cell_size], color="k")
+        """ Grafica las paredes del laberinto"""
+
+        #Obtenemos el numero de fila y columnas tiene el laberinto
+        numRows = (self.maze.getRowCol())[0]
+        numCol = (self.maze.getRowCol())[1]
+        # Y la estructura del laberinto
+        mazeStructure = self.maze.getMaze()
+
+        print(mazeStructure)
+
+        for i in range(numRows):
+            for j in range(numCol):
+
+                indexRow = numRows - i - 1
+                indexCol = j
+
+                # Si hay una pared a la izquierda
+                if mazeStructure[i][j] & 1 > 0:
+                    self.ax.plot([indexCol*self.cellSize, indexCol*self.cellSize],
+                                 [indexRow*self.cellSize, (indexRow+1)*self.cellSize], color="k")
+                # Si hay una pared a arriba
+                if mazeStructure[i][j] & 2 > 0:
+                    self.ax.plot([j*self.cellSize, (j+1)*self.cellSize],
+                                 [(indexRow+1)*self.cellSize, (indexRow+1)*self.cellSize], color="r")
+                # Si hay una pared a la derecha
+                if mazeStructure[i][j] & 4 > 0:
+                    self.ax.plot([(indexCol+1)*self.cellSize, (indexCol+1)*self.cellSize],
+                                 [indexRow*self.cellSize, (indexRow+1)*self.cellSize], color="b")
+                # Si hay una pared abajo
+                if mazeStructure[i][j] & 8 > 0:
+                    self.ax.plot([(indexCol+1)*self.cellSize, indexCol*self.cellSize],
+                                 [indexRow*self.cellSize, indexRow*self.cellSize], color="m")
+
+                #if self.maze.initial_grid[i][j].is_entry_exit == "entry":
+                #    self.ax.text(j*self.cell_size, i*self.cell_size, "START", fontsize=7, weight="bold")
+                #elif self.maze.initial_grid[i][j].is_entry_exit == "exit":
+                #    self.ax.text(j*self.cell_size, i*self.cell_size, "END", fontsize=7, weight="bold")
+
+    def configurePlot(self):
+        """Setea las configuraciones iniciales del plot. Ademas crea el plot y los ejes"""
+
+        numRows = (self.maze.getRowCol())[0]
+        numCol = (self.maze.getRowCol())[1]
+
+        # Create the plot figure
+        fig = plt.figure(figsize = (7, 7*numRows/numCol))
+
+        # Create the axes
+        self.ax = plt.axes()
+
+        # Set an equal aspect ratio
+        self.ax.set_aspect("equal")
+
+        # Remove the axes from the figure
+        self.ax.axes.get_xaxis().set_visible(False)
+        self.ax.axes.get_yaxis().set_visible(False)
+
+        title_box = self.ax.text(0, numRows + numCol + 0.1,
+                            r"{}$\times${}".format(numRows, numCol),
+                            bbox={"facecolor": "gray", "alpha": 0.5, "pad": 4}, fontname="serif", fontsize=15)
+
+        return fig
 
 
-
-class mazeForVisualization(object):
+class MazeForVisualization(object):
 
     """Clase guarda el laberinto para visualizar.
 
     Atributos: que lleva la visualización
 
         + fileName (string): El archivo donde esta guerdado el laberinto de la simulacion
-        + maze: (2-D np.array) El laberinto que va a ser visualizado.
+        + structure: (2-D np.array) La estructura del laberinto que va a ser visualizado.
         + numRows (int): Numero de filas que tiene el laberinto
         + numCols (int): Numero de columnas que tiene el laberinto
         + entryCell (list): Coordenada de la celda de comienzo del laberinto
@@ -87,7 +127,7 @@ class mazeForVisualization(object):
     def __init__(self, fileName):
 
         self.fileName = fileName
-        self.maze = None
+        self.structure = None
         self.numRows = None
         self.numCols = None
         self.entryCell = None
@@ -114,7 +154,7 @@ class mazeForVisualization(object):
                     temp[indexRow][indexCol] = cellValue & 15 #Quitamos la informacion de si es salida o entrada
 
         if (noError == True):
-            self.maze = temp
+            self.structure = temp
             self.numRows = len(temp)
             self.numCols = len(temp[0])
             print("Laberinto guardado correctamente")
@@ -125,7 +165,7 @@ class mazeForVisualization(object):
 
     def getMaze(self):
         """Retorna la matriz del laberinto """
-        return self.maze
+        return self.structure
 
     def getRowCol(self):
         """Retorna tupla con los valores de cantidad de filas y columnas que tiene el laberinto """
