@@ -17,6 +17,11 @@ class Maze():
 
     def __init__(self):
         self.grid = None
+        self.start = None
+        self.end = None
+        self.orphans = []
+        self.trajectory = []
+
 
     def saveMaze(self, fname):
         size = (len(self.grid), len(self.grid[0]))
@@ -24,7 +29,17 @@ class Maze():
         for row in range(size[0]):
             for col in range(size[1]):
                 data[row,col] = int(self.grid[row][col].sumWalls())
+        data[self.start[0], self.start[1]] += 16
+        data[self.end[0],self.end[1]] += 32
+        # for o in self.orphans:
+        #     data[o.pos[0], o.pos[1]] += 64
         np.save(fname, data)
+        tfile = open(fname+".traj", "w")
+        for t in self.trajectory:
+            tfile.writelines("{},\t{}\n".format(t[0], t[1]))
+        tfile.close()
+
+
     def initMaze(self, size, walls=True):
         """
         Crea la grid de dimensiones dadas por "size".
@@ -56,7 +71,8 @@ class BoxMaze(Maze):
         right = size[1] -1
         if not start: start = (0,0)
         if not end: end = (bottom, right)
-
+        self.start = start
+        self.end = end
 
         # Implementa un laberinto con forma de caja
         for i in range(size[0]):
@@ -102,10 +118,13 @@ class BacktrackingMaze(Maze):
         la posición de la entrada y la salida del laberinto.
         """
 
+        # Inicializa 'start' y 'end' por default. Define variables auxiliares
         bottom = size[0] -1
         right = size[1] -1
         if not start: start = (0,0)
         if not end: end = (bottom, right)
+        self.start = start
+        self.end = end
 
         total = size[0]*size[1]
         stack = []
@@ -114,6 +133,7 @@ class BacktrackingMaze(Maze):
         stack.append(cell)
         i = 0
         while len(stack) > 0:
+            self.trajectory.append(cell.pos)
             print("step:\t{}\tstackLen:\t{}\tpos:\t{}".format(i,len(stack),stack[-1].pos))
             i += 1
             newcell = self.chooseNew(cell)
@@ -125,12 +145,16 @@ class BacktrackingMaze(Maze):
                 continue
             else: 
                 cell = stack.pop()
-        orphans = []
+
+
         for row in self.grid:
             for cell in row:
-                if cell.getVisited() == False: orphans.append(cell)
+                if cell.getVisited() == False:
+                    self.orphans.append(cell)
         print("orphans:")
-        print([c.pos for c in orphans])
+        print([c.pos for c in self.orphans])
+
+
 
     def chooseNew(self,cell):
         """
@@ -147,7 +171,7 @@ class BacktrackingMaze(Maze):
 if __name__ == "__main__":
     maze = BacktrackingMaze()
     # maze = BoxMaze()
-    size = (10,10)
+    size = (5,5)
     maze.initMaze(size)
     maze.buildMaze(size)
     maze.saveMaze("testname")
