@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 import matplotlib as mpl
+import matplotlib.animation as animation
 
 class Visualizer(object):
     """Clase que lleva la visualización.
@@ -28,6 +29,31 @@ class Visualizer(object):
         self.width = (maze.getRowCol())[1] * cellSize
         self.ax = None
 
+    def animator(self, mazeTuple=(True, "k", "palegreen", "lightcoral")):
+
+
+        def updatefig(i):
+
+            fig.clear()
+
+            aa = self.configurePlot(createFigure=False, xkcd=mazeTuple[0])
+
+            # Graficamos las paredes
+            self.plotWalls(colorWall=mazeTuple[1], entryColor=mazeTuple[2], exitColor=mazeTuple[3])
+
+            col = self.bot.getPos()[1]
+            numRows = (self.maze.getRowCol())[0]
+            row = (numRows - self.bot.getPos()[0] - 1)
+            self.bot.drawBot(row, col, self.bot.getOrientation(), self.cellSize, self.ax)
+            self.bot.nextKeyframe()
+            plt.draw()
+
+        fig = self.configurePlot(createFigure=True, xkcd=mazeTuple[0])
+        anim = animation.FuncAnimation(fig, updatefig, self.bot.getMaxKeyframe()+20)
+        anim.save("test.mp4", fps=3)
+
+
+
     def showMaze(self, xkcd=True, colorWall="k", entryColor="palegreen" ,exitColor="lightcoral"):
         """Grafica el laberinto pelado
             Argumentos:
@@ -37,16 +63,16 @@ class Visualizer(object):
                 + exitColor (str): Color de la salida. (Default lightcoral)
         """
         # Crea la figura y el estilo de los ejes
-        tfig = self.configurePlot(xkcd)
+        fig = self.configurePlot(xkcd)
 
         # Graficamos las paredes
         self.plotWalls(colorWall, entryColor, exitColor)
 
-        col = self.bot.getPos()[1]
-        numRows = (self.maze.getRowCol())[0]
-        row = (numRows - self.bot.getPos()[0] - 1)
+        #col = self.bot.getPos()[1]
+        #numRows = (self.maze.getRowCol())[0]
+        #row = (numRows - self.bot.getPos()[0] - 1)
 
-        self.bot.drawBot(row, col, self.bot.getOrientation(), self.cellSize, self.ax)
+        #self.bot.drawBot(row, col, self.bot.getOrientation(), self.cellSize, self.ax)
 
         # Mostramos el grafico
         plt.show()
@@ -110,7 +136,7 @@ class Visualizer(object):
                 facecolor=exitColor)
         self.ax.add_patch(rectExit)
 
-    def configurePlot(self, xkcd=True):
+    def configurePlot(self, createFigure=True, xkcd=True):
         """Setea las configuraciones iniciales del plot. Ademas crea el plot y los ejes
             Argumentos:
                 + xkcd (bool): Habilitar un estilo xkcd(). Default:Enable
@@ -125,7 +151,10 @@ class Visualizer(object):
         else:
             plt.rcdefaults()
 
-        fig = plt.figure(figsize = (7, 7*numRows/numCol))
+        if (createFigure == True):
+            fig = plt.figure(figsize = (7, 7*numRows/numCol))
+        else:
+            fig = None
 
         # Create the axes
         self.ax = plt.axes()
@@ -139,7 +168,6 @@ class Visualizer(object):
 
         return fig
 
-    #def animator(self):
 
 
 

@@ -1,10 +1,15 @@
 import vis as vis
 
-arch = "lab10.npy"
+arch = "lab10.txt"
 laberinto = vis.MazeForVisualization()
 laberinto.loadMazeFile(arch)
-vv = vis.Visualizer(laberinto, 2, "pepe")
-vv.showMaze(xkcd=False)
-
+arch = "botpath.txt"
+bot = vis.RegularPolygonBot(numVertices=3, faceColor="r")
+#bot = vis.RegularPolygonBot()
+bot.loadPath(arch)
+#bot.orientation = 1
+vv = vis.Visualizer(laberinto, bot, 2, "pepe", None, None)
+#vv.showMaze(xkcd=True)
+vv.animator()
 
 #vv.showMaze(xkcd=False, colorWall="r", entryColor="magenta" ,exitColor="y")
