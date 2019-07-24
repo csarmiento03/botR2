@@ -1,13 +1,17 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
+import matplotlib as mpl
 
 class Visualizer(object):
     """Clase que lleva la visualización.
 
     Atributos:
 
-        + maze: (obj mazeForVisualization) Objeto de laberinto que va a ser visualizado.
+        + maze (obj mazeForVisualization): Objeto de laberinto que va a ser visualizado.
+        + bot (obj hijos de BotForVisualization): Objeto del bot que va a ser visualizado.
+        + deltaTime (int): Delta de tiempo que se va ejecutar cada cuadro de la simulacion
+        + smoother (int): Numero que indica cuantos cuadros habra entre cada keyframe.
         + cellSize (int): Que tan grande va a ser el laberinto
         + height (int): El largo del laberinto
         + width (int): El ancho del laberinto
@@ -16,19 +20,13 @@ class Visualizer(object):
 
     """
 
-    def __init__(self, maze, cellSize, mediaFilename):
+    def __init__(self, maze, bot, cellSize, deltaTime, smoother, mediaFilename):
         self.maze = maze
+        self.bot = bot
         self.cellSize = cellSize
         self.height = (maze.getRowCol())[0] * cellSize
         self.width = (maze.getRowCol())[1] * cellSize
         self.ax = None
-
-    def setMediaFilename(self, filename):
-        """Setea el atributo mediaFilename
-            Argumentos:
-                + filename (string): El nombre para los archivos y graficos
-        """
-        self.mediaFilename = filename
 
     def showMaze(self, xkcd=True, colorWall="k", entryColor="palegreen" ,exitColor="lightcoral"):
         """Grafica el laberinto pelado
@@ -44,10 +42,14 @@ class Visualizer(object):
         # Graficamos las paredes
         self.plotWalls(colorWall, entryColor, exitColor)
 
+        col = self.bot.getPos()[1]
+        numRows = (self.maze.getRowCol())[0]
+        row = (numRows - self.bot.getPos()[0] - 1)
+
+        self.bot.drawBot(row, col, self.bot.getOrientation(), self.cellSize, self.ax)
+
         # Mostramos el grafico
         plt.show()
-
-        # Handle any potential saving
 
 
     def plotWalls(self, colorWall="k", entryColor="palegreen" ,exitColor="lightcoral"):
@@ -137,6 +139,9 @@ class Visualizer(object):
 
         return fig
 
+    #def animator(self):
+
+
 
 class MazeForVisualization(object):
 
@@ -166,8 +171,8 @@ class MazeForVisualization(object):
             Argumentos:
                 + fileName (string): El archivo donde esta guardado el laberinto de la simulacion
          """
-
-        temp = np.load(fileName) #Variable temporal que va a guardar el numpy array qeu se obtiene de leer el archivo
+         #Variable temporal que va a guardar el numpy array qeu se obtiene de leer el archivo
+        temp = np.loadtxt(fileName, dtype=int, comments='#', delimiter=",", skiprows=0)
 
         noError = True #Flag que indica que se cargo todo correctamente
 
@@ -239,7 +244,7 @@ class BotForVisualization(object):
         """
 
         #Variable temporal que va a guardar el numpy array qeu se obtiene de leer el archivo
-        path = np.loadtxt(filename, dtype=int, comments='#', delimiter=",", skiprows=1)
+        path = np.loadtxt(filename, dtype=int, comments='#', delimiter=",", skiprows=0)
         noError = True #Flag que indica que se cargo todo correctamente
 
         #Si el valor correspondiente a una orientacion no es dato valido (tiene que ser
@@ -283,7 +288,16 @@ class BotForVisualization(object):
         """Metodo que devuelve la orientacion del bot
 
         """
-        return self.orientation
+        if (self.orientation == 0):
+            angle = 0
+        elif(self.orientation == 1):
+            angle = 90
+        elif(self.orientation == 2):
+            angle = 180
+        else:
+            angle = 270
+
+        return angle
 
     def getActualKeyframe(self):
         """Metodo que devuelve en que keyframe está
@@ -298,41 +312,49 @@ class BotForVisualization(object):
         return self.maxKeyframe
 
 
-#class TriangleBot(BotForVisualization):
-#
-#    """Clase dibuja el bot que recorre el camino de la simulacion.
+class RegularPolygonBot(BotForVisualization):
 
-#    Atributos: que lleva la visualización
-#
-#        + fileName (string): El archivo donde esta guardado el camino
-#        + structure: (2-D np.array) La estructura del laberinto que va a ser visualizado.
-#        + numRows (int): Numero de filas que tiene el laberinto
-#        + numCols (int): Numero de columnas que tiene el laberinto
-#        + entryCell (list): Coordenada de la celda de comienzo del laberinto
-#        + exitCell (list): Coordenada de la celda de salida del laberinto
+    """Clase dibuja el bot que recorre el camino de la simulacion con una forma de poligono regular
 
-#    """
-    #def __init__(self):
+    Atributos:
 
-    #    self.structure = None
-    #    self.numRows = None
-    #    self.numCols = None
-    #    self.entryCell = None
-    #    self.exitCell = None
+        + Hereda los atributos de la clase padre BotForVisualization
+        + drawing (matplotlib.patches.RegularPolygon): Poligono regular de matplotlib (triangulo)
+        + numVertices (int): Numero de vertices que tiene el poligono
+        + faceColor (string): Color del poligono
 
-    #def drawBot(self, pos, angleRotation):
-    #    """Metodo dibuja el bot en una posicion y con una rotacion dada.
-    #
-    #        Argumentos:
-    #            + pos (string): tupla con la posicion donde debe dibujar el robot
-    #            + angleRotation: Angulo de orientacion que debe dibujar el bot.
-    #
-    #    """
+    """
+    def __init__(self, numVertices=3, faceColor="m"):
 
+        self.drawing = None
+        self.numVertices = numVertices
+        self.faceColor = faceColor
 
-    #def loadPath(self, filename):
-    #    """Metodo que carga el archivo con el camino recorrido por el bot.
-    #
-    #        Argumentos:
-    #            + fileName (string): El archivo donde esta guardado el camino
-    #    """
+    def drawBot(self, row, col, angleRotation, cellSize, axes):
+        """Metodo dibuja el bot en una posicion y con una rotacion dada.
+
+            Argumentos:
+                + row (int): Fila que nos indica en que fila esta el bot
+                + col (int): Fila que nos indica en que columna esta el bot
+                + angleRotation (int): Angulo de orientacion que debe dibujar el bot.
+                + cellSize (float): Tamaño de la celda a dibujar el robot
+                + axes (matplotlib axes): Ejes donde se dibuja el bot
+
+        """
+        x = (col + 0.5)*cellSize
+        y = (row + 0.5)*cellSize
+
+        #Dibujamos el poligono
+        polygon = mpatches.RegularPolygon((0, 0), self.numVertices, radius=cellSize/3, facecolor=self.faceColor)
+
+        #Rotamos el poligono en los angulos pedidos
+        t1 = mpl.transforms.Affine2D().rotate_deg(angleRotation)
+        #Movemos el poligono a la posicion indicada
+        t2 = mpl.transforms.Affine2D().translate(x, y)
+
+        #Unimos todas las transformaciones
+        tra = t1 + t2 + axes.transData
+        polygon.set_transform(tra)
+
+        self.drawing = polygon
+        axes.add_patch(polygon)
