@@ -129,6 +129,6 @@ for indexrow, row in enumerate(cell):
         matrix[indexrow, indexcol] = col[0] + 2*col[1] + 4*col[2] + 8*col[3]
 
 matrix[0,4] = matrix[0,4] + 16
-matrix[9,6] = matrix[9,6] + 32
+matrix[9,5] = matrix[9,5] + 32
 
 np.save("lab10", matrix.astype(int))

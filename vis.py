@@ -120,6 +120,8 @@ class Visualizer(object):
         # Create the plot figure
         if (xkcd == True):
             plt.xkcd()
+        else:
+            plt.rcdefaults()
 
         fig = plt.figure(figsize = (7, 7*numRows/numCol))
 
