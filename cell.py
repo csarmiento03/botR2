@@ -50,7 +50,8 @@ class Cell(object):
         return self.visited
 
     def getWalls(self):
-        return [self.wallW, self.wallN, self.wallE, self.wallS]
+        return [int(self.wallW), int(self.wallN),
+                int(self.wallE), int(self.wallS)]
         
     def getPos(self):
         return self.pos
@@ -88,7 +89,7 @@ class Cell(object):
 
         if checkVisited:
             for i in neighbours:
-                if i.visited:
+                if i.getVisited():
                     neighbours.remove(i)
         print([n.pos for n in neighbours])
         return neighbours
