@@ -7,66 +7,98 @@ class Cell(object):
 
     """
     Clase que conforma laberintos con atributos y métodos que facilitan su construcción.
+    Atributos:
+        pos: una tupla de enteros del tipo (y,x) ó (row, col).
+        start: una tupla de enteros del tipo (y,x) ó (row, col).
+        end: una tupla de enteros del tipo (y,x) ó (row, col).
+        visited: bool
+        wall{W,N,E,S}: bool que representa las paredes en dirección de puntos cardinales.
     """
 
     def __init__(self, pos, walls=False):
-        """
-        Definicion del constructor de la clase donde escribo todos los 
-        atributos o variables que va a tener la clase y que pueden 
-        ser llamados por los otros objeto.
-        """
         self.pos = pos         
         self.start = False
         self.end = False
         self.visited = False
         if walls:
-            self.wallN = True
-            self.wallS = True
-            self.wallE = True
             self.wallW = True
+            self.wallN = True
+            self.wallE = True
+            self.wallS = True
         else:
-            self.wallN = False
-            self.wallS = False
-            self.wallE = False
             self.wallW = False
+            self.wallN = False
+            self.wallE = False
+            self.wallS = False
 
-    """ Setters y getters para respetar el paradigma OOP."""
+    """ 
+    Conjunto de setters y getters para respetar el paradigma OOP.
+    """
     def setStart(self, arg):
+        """
+        Asigna 'arg' a 'start'
+        """
         self.start = arg
 
     def getStart():
+        """
+        Devuelve 'start'
+        """
         return self.start
 
     def setEnd(self, arg):
+        """
+        Asigna 'arg' a 'end'
+        """
         self.end = arg
 
     def getEnd(self):
+        """
+        Devuelve 'end'
+        """
         return self.end
 
     def setVisited(self, arg):
+        """
+         Asigna 'arg' a 'visited'
+        """
         self.visited = arg
 
     def getVisited(self):
+        """
+        Devuelve 'visited'
+        """
         return self.visited
 
     def getWalls(self):
+        """
+        Devuelve una lista de {0,1} indicando la existencia de paredes.
+        El orden de los elementos es [W,N,E,S].
+        """
         return [int(self.wallW), int(self.wallN),
                 int(self.wallE), int(self.wallS)]
         
     def getPos(self):
+        """
+        devuelve 'pos'
+        """
         return self.pos
 
     def sumWalls(self):
+        """
+        Computa un codigo específico para la representación 2D de la celda en el laberinto.
+        El código se encuentra especificado en 'doc.md'.
+        """
         total = int(self.wallW) + 2*int(self.wallN) 
         total += 4*int(self.wallE) + 8*int(self.wallS)
         return total
 
     def findNeighbours(self, grid, checkVisited=True):
         """
-        Metodo encontrar vecinos en el cual, primero se calculan 
-        los primeros vecinos respecto a su posicion actual. Luego, se
-        revisa si esos vecinos hacen parte de la grilla y si han sido
-        o no visitados. Para esto, se usa el atributo visited.
+        Devuelve una lista de celdas vecinas.
+        grid: atributo de maze.
+        checkVisited: [optional] devuelve solo las celdas vecinas que
+                      no hayan sido visitadas hasta el momento.
         """    
 
         neighbours = []
@@ -81,14 +113,14 @@ class Cell(object):
         # Desindexa los vecinos que ya han sido visitados.
         if checkVisited:
             for i in neighbours:
-                if i.getVisited(): neighbours.remove(i)
-        print([n.pos for n in neighbours])
+                if i.getVisited() != False:
+                    neighbours.remove(i)
         return neighbours
  
     def checkWall(self, otherCell):
         """
-        Metodo que hace una revision de la ubicacion de la otra
-        celda con respecto a la celda en la cual se encuentra.
+        Revisa si existe una pared que conecte con 'otherCell' y devuelve un bool.
+        otherCell: objeto 'Cell' que se encuentra contiguo en la 'grid' de un 'Maze'
         """   
         x0 = self.pos[1]
         y0 = self.pos[0]
@@ -109,8 +141,8 @@ class Cell(object):
 
     def destroyWall(self,otherCell):
         """
-        Metodo para destruir la pared de la celda vecina.
-        Aquí rompe su propia pared y la del otro.
+        Destruye las paredes que conectan con 'otherCell'
+        otherCell: objeto 'Cell' que se encuentra contiguo en la 'grid' de un 'Maze'
         """
         x0 = self.pos[1]
         y0 = self.pos[0]

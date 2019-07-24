@@ -10,29 +10,57 @@ from cell import Cell
 
 class Maze():
     """
-    Esta versión genérica solo construye un laberinto trivial 
-    que consiste en una caja con una entrada y una salida.
-
+    Clase 'Maze' genérica, solo es capaz de inicializar un laberinto.
+    Atributos:
+        grid: una lista de listas anidadas que conienen objetos 'Cell'.
+        start: una tupla de enteros del tipo (y,x) ó (row, col).
+        end: una tupla de enteros del tipo (y,x) ó (row, col).
+    Invocación:
+        size: Una tupla de enteros del tipo (y,x) ó (row, col).
+              Definen las dimensiones de la 'grid'.
+        walls: bool que indica si los objetos 'Cell' a inicializar
+               tendrán las paredes activas por defecto o no.
     """
 
-    def __init__(self):
-        self.grid = None
-        self.start = None
-        self.end = None
-        self.orphans = []
-        self.trajectory = []
+    def __init__(self, size, walls):
+        self.size = size
+        self.start = (0,0)
+        self.end = (0,0)
+        self.grid = list()
+
+        # Inicializa 'grid' de acuerdo a 'size'.
+        for i in range(size[0]):
+            row = list()
+            for j in range(size[1]):
+                row.append(Cell(pos=(i,j), walls=walls))
+            self.grid.append(row)
 
     def getStart(self):
+        """
+        Devuelve 'start'
+        """
         return self.start
 
     def getEnd(self):
+        """
+        Devuelve 'end'
+        """
         return self.end
 
     def getWalls(self, pos):
+        """
+        Devuelve una lista con información de las paredes 
+        de una celda en posición 'pos'. ver Cell.getwalls().
+        """
         try: return self.grid[pos[0]][pos[1]].getWalls()
         except: pass
 
     def saveMaze(self, fname):
+        """
+        Guarda el laberinto en un archivo de texto listo para
+        ser levantado por 'vis.py'.
+        fname: Nombre del archivo de texto.
+        """
         size = (len(self.grid), len(self.grid[0]))
         data = np.zeros(size, dtype=int)
         for row in range(size[0]):
@@ -40,48 +68,35 @@ class Maze():
                 data[row,col] = int(self.grid[row][col].sumWalls())
         data[self.start[0], self.start[1]] += 16
         data[self.end[0],self.end[1]] += 32
-        # for o in self.orphans:
-        #     data[o.pos[0], o.pos[1]] += 64
-        np.save(fname, data)
-        tfile = open(fname+".traj", "w")
-        for t in self.trajectory:
-            tfile.writelines("{},\t{}\n".format(t[0], t[1]))
-        tfile.close()
+        np.savetxt(fname, data, delimiter=',', fmt="%d")
 
 
-    def initMaze(self, size, walls=True):
+    def buildMaze(self, start=False, end=False):
         """
-        Crea la grid de dimensiones dadas por "size".
-        "walls" indica si las celdas están rodeadas de paredes por defecto.
-        """
-        self.grid = list()
-        for i in range(size[0]):
-            row = list()
-            for j in range(size[1]):
-                row.append(Cell(pos=(i,j), walls=walls))
-            self.grid.append(row)
-
-    def buildMaze(self,size, start=False, end=False):
-        """
-        Función dummy
+        Función dummy.
         """
         pass
 
 class BoxMaze(Maze):
 
-    def buildMaze(self, size, start=False, end=False):
+    def buildMaze(self, start=False, end=False):
         """
         Crea un laberinto trivial de tamaño "size" que consiste en
         una caja vacía. "start" y "end" son tuplas que pueden especificar
         la posición de la entrada y la salida del laberinto.
         """
-        # Asigna entrada y salida por default. Define variables auxiliares.
+        # Actualiza 'start' y 'end' de acuerdo a los argumentos.
+        # Define variables auxiliares.
+
+        size = self.size
         bottom = size[0] -1
         right = size[1] -1
-        if not start: start = (0,0)
-        if not end: end = (bottom, right)
-        self.start = start
-        self.end = end
+        if start != False: self.start = start
+        else: self.start = start
+        if end != False: end = (bottom, right)
+        else: self.end = end
+
+
 
         # Implementa un laberinto con forma de caja
         for i in range(size[0]):
@@ -110,7 +125,7 @@ class BacktrackingMaze(Maze):
     laberintos no gigantes :)
     """
 
-    def buildMaze(self,size,start=False,end=False):
+    def buildMaze(self, start=False, end=False):
         """
         Construye el laberinto de acuerdo al siguiente algoritmo:
         Inicio: 
@@ -127,31 +142,29 @@ class BacktrackingMaze(Maze):
         la posición de la entrada y la salida del laberinto.
         """
 
-        # Inicializa 'start' y 'end' por default. Define variables auxiliares
+        # Actualiza 'start' y 'end' de acuerdo a los argumentos.
+        # Define variables auxiliares.
+        
+        size = self.size
         bottom = size[0] -1
         right = size[1] -1
-        if not start: start = (0,0)
-        if not end: end = (bottom, right)
-        self.start = start
-        self.end = end
+        if start != False: self.start = start
+        else: self.start = start
+        if end != False: end = (bottom, right)
+        else: self.end = end
 
+        # Elige una celda inicial al azar.
         cell = self.grid[random.randint(0,bottom)][random.randint(0,right)]
         cell.setVisited(True)
         stack = [cell]
         i = 0
+
+        # Inicia el algoritmo de Recursive Backtracking
         while len(stack) > 0:
 
-            # TESTING
-            # traj = (cell.pos, [c.pos for c in cell.findNeighbours(self.grid)])
-            # self.trajectory.append(traj)
-            # print("step:\t{}\tstackLen:\t{}\tpos:\t{}".format(i,len(stack),stack[-1].pos))
-            # i += 1
-
-            # LOGIC
             try:
                 newcell = self.chooseNew(cell)
                 if newcell.getVisited():
-                    # print(cell.pos, "Already Visited! >:[")
                     cell = stack.pop()
                 else:
                     cell.destroyWall(newcell)  
@@ -159,32 +172,19 @@ class BacktrackingMaze(Maze):
                     cell = newcell
                     stack.append(newcell)
 
-            except Exception as exc:
-                # print(cell, exc)
+            except :
                 cell = stack.pop()
 
-            # if not newcell.getVisited():
-            #     stack.append(newcell)
-            #     newcell.setVisited(True)
-            #     cell.destroyWall(newcell)
-            #     cell = newcell
-            #     continue
-            # else: 
-            #     cell = stack.pop()
-
-
-        for row in self.grid:
-            for cell in row:
-                if cell.getVisited() == False:
-                    self.orphans.append(cell)
-        print("orphans:")
-        print([c.pos for c in self.orphans])
+        # Agrega la entrada y la salida al laberinto.
+        #implementación TRIVIAL!
+        self.grid[start[0]][start[1]].wallS = False
+        self.grid[end[0]][end[1]].wallN = False
 
 
 
     def chooseNew(self,cell):
         """
-        Elige una nueva celda vecina al azar y la devuelve.
+        Devuelve una celda vecina no visitada al azar.
         """
         options = cell.findNeighbours(self.grid, checkVisited=True)
         for i in options:
@@ -200,9 +200,7 @@ class BacktrackingMaze(Maze):
 
 
 if __name__ == "__main__":
-    maze = BacktrackingMaze()
-    # maze = BoxMaze()
     size = (10,25)
-    maze.initMaze(size)
-    maze.buildMaze(size)
+    maze = BacktrackingMaze(size, True)
+    maze.buildMaze()
     maze.saveMaze("testname")
