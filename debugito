@@ -1,8 +1,8 @@
 import vis as vis
 
 arch = "lab10.npy"
-laberinto = vis.MazeForVisualization(arch)
-laberinto.loadMazeFile()
+laberinto = vis.MazeForVisualization()
+laberinto.loadMazeFile(arch)
 vv = vis.Visualizer(laberinto, 2, "pepe")
 vv.showMaze(xkcd=False)
 
