@@ -27,51 +27,36 @@ class Bot(object):
 
     def decide(self):
 
-        """Cambia la orientacion del robot hacia la direccion indicada con el 
-        indice i"""
+        """Cambia la orientacion del robot segun lo que indique su sensor.
+        Siempre quedara apuntando a una direccion en la que no haya una pared.
+        Primero verificara si delante suyo hay pared. Si no hay, se quedara 
+        en esa posicion. Luego, intentara hacia su derecha, luego a su izquierda
+        y por ultimo hacia atras."""
 
-        if self.sensor[np.nonzero(self.orientation)] == 0:
+        if self.sensor[np.nonzero(self.orientation)[0][0]] == 0:
+            
             pass
-        else:
-            if np.nonzero(self.orientation) == 0:
-                if self.sensor[1] == 0:
-                    self.orientation = np.zeros(4)
-                    self.orientation[1] = 1
-                elif self.sensor[3] == 0:
-                    self.orientation = np.zeros(4)
-                    self.orientation[3] = 1
-                else:
-                    self.orientation = np.zeros(4)
-                    self.orientation[2] = 1
-            elif np.nonzero(self.orientation) == 1:
-                if self.sensor[2] == 0:
-                    self.orientation = np.zeros(4)
-                    self.orientation[2] = 1
-                elif self.sensor[0] == 0:
-                    self.orientation = np.zeros(4)
-                    self.orientation[0] = 1
-                else:
-                    self.orientation = np.zeros(4)
-                    self.orientation[3] = 1
-            elif np.nonzero(self.orientation) == 2:
-                if self.sensor[3] == 0:
-                    self.orientation = np.zeros(4)
-                    self.orientation[3] = 1
-                elif self.sensor[1] == 0:
-                    self.orientation = np.zeros(4)
-                    self.orientation[1] = 1
-                else:
-                    self.orientation = np.zeros(4)
-                    self.orientation[0] = 1
-            else:
-                if self.sensor[0] == 0:
-                    self.orientation = np.zeros(4)
-                    self.orientation[0] = 1
-                elif self.sensor[2] == 0:
-                    self.orientation = np.zeros(4)
-                    self.orientation[2] = 1
-                else:
-                    self.orientation = np.zeros(4)
-                    self.orientation[1] = 1
         
-                    
+        else:
+            
+            aux = np.nonzero(self.orientation)[0][0]
+            
+            if self.sensor[aux-3] == 0:
+                
+                self.orientation = np.zeros(4)
+                self.orientation[aux-3] = 1
+                
+            elif self.sensor[aux-1] == 0:
+                
+                self.orientation = np.zeros(4)
+                self.orientation[aux-1] = 1
+            elif self.sensor[aux-2] == 0:
+                
+                self.orientation = np.zeros(4)
+                self.orientation[aux-2] = 1
+
+    def get_orientation(self):
+        
+        """Metodo para obtener el atributo orientation"""
+        
+        return self.orientation
