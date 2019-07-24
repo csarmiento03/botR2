@@ -55,7 +55,7 @@ class Bot(object):
                 self.orientation = np.zeros(4)
                 self.orientation[aux-2] = 1
 
-    def get_orientation(self):
+    def getOrientation(self):
         
         """Metodo para obtener el atributo orientation"""
         
