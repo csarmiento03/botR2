@@ -210,52 +210,92 @@ class MazeForVisualization(object):
         """Retorna la posicion de la salida """
         return self.exitCell
 
-#class BotForVisualization(object):
+class BotForVisualization(object):
 
-#    """Clase que dibuja el bot que recorre el camino de la simulacion.
-#
-#    Atributos: que lleva la visualización
-#
-#        + path (2-D np.array): Estructura de numpy con el camino recorrido y las orientaciones del bot
-#
-#    """
-#    def __init__(self):
-#
-#        self.path = None
-#
-#    def loadPath(self, filename):
-#        """Metodo que carga el archivo con el camino recorrido por el bot.
-#
-#            Argumentos:
-#                + fileName (string): El archivo donde esta guardado el camino
-#        """
-#
-##            temp = np.load(filename) #Variable temporal que va a guardar el numpy array qeu se obtiene de leer el archivo
-#
-#            noError = True #Flag que indica que se cargo todo correctamente
-#            np.loadtxt(fname, dtype=<class 'float'>, comments='#', delimiter=None, converters=None, skiprows=0, usecols=None, unpack=False, ndmin=0, encoding='bytes', max_rows=None)[source]¶
-#            #Chequeamos que el archivo tiene valores esperados
-#            for indexRow, row in enumerate(temp):
-#                for indexCol, cellValue in enumerate(row):
-#                    if cellValue > 63 or cellValue < 0: #Esto no es un laberinto
-#                        noError = False
-#                        break
-#                    elif cellValue > 15:
-#                        if (cellValue & 16 > 0): #Vemos si es una entrada
-#                            self.entryCell = (indexRow, indexCol)
-#                        if (cellValue & 32 > 0): #Vemos si es una salida
-#                            self.exitCell = (indexRow, indexCol)
-#                        temp[indexRow][indexCol] = cellValue & 15 #Quitamos la informacion de si es salida o entrada
-#
-#            if (noError == True):
-#                self.structure = temp
-#                self.numRows = len(temp)
-#                self.numCols = len(temp[0])
-#                print("Laberinto guardado correctamente")
-#            else:
-#                self.entryCell = None
-#                self.exitCell = None
-#                print("El archself.numRowsivo de entrada no es un archivo valido")
+    """Clase que dibuja el bot que recorre el camino de la simulacion.
+
+    Atributos: que lleva la visualización
+
+        + path (2-D np.array): Estructura de numpy con el camino recorrido y las orientaciones del bot
+        + pos (tuple): Tupla que guarda en que casillero del laberinto esta el robot
+        + orientation (int): Orientacion que tiene el robot
+        + maxKeyframe (int): El ultimo paso del recorrido del robot.
+        + actualKeyframe (int): En que paso está el robot.
+
+    """
+    def __init__(self):
+
+        self.path = None
+        self.pos = None
+        self.orientation = None
+        self.maxKeyframe = None
+        self.actualKeyframe = None
+
+    def loadPath(self, filename):
+        """Metodo que carga el archivo con el camino recorrido por el bot.
+
+            Argumentos:
+                + fileName (string): El archivo donde esta guardado el camino
+        """
+            #Variable temporal que va a guardar el numpy array qeu se obtiene de leer el archivo
+            temp = np.loadtxt(filename, dtype=int, comments='#', delimiter=",", skiprows=1 )
+
+            noError = True #Flag que indica que se cargo todo correctamente
+
+            #Si el valor correspondiente a una orientacion no es dato valido (tiene que ser
+            # entre 0 y 3)
+            for row in temp:
+                if row[2] > 3 or row[2] < 0:
+                    noError = False
+                    break
+
+            if (noError == True):
+                self.path = path
+                self.pos = (path[0][0], path[0][1])
+                self.orientation = path[0][2]
+                self.maxKeyframe = len(path) - 1
+                self.actualKeyframe = 0
+                print("Camino recorrido del bot guardado correctamente")
+            else:
+                self.path = None
+                self.pos = None
+                self.orientation = None
+                self.maxKeyframe = None
+                self.actualKeyframe = None
+                print("El archivo de entrada no es un archivo valido")
+
+    def nextKeyframe(self):
+        """Metodo que modifica los datos del bots en posicion y orientacion.
+
+        """
+        if (self.actualKeyframe < self.maxKeyframe):
+            self.actualKeyframe += 1
+            self.pos = (path[self.path][0], path[self.path][1])
+            self.orientation = self.path[0][2]
+
+    def getPos():
+        """Metodo que devuelve la posicion del bot
+
+        """
+        return self.pos
+
+    def getOrientation():
+        """Metodo que devuelve la orientacion del bot
+
+        """
+        return self.orientation
+
+    def getActualKeyframe():
+        """Metodo que devuelve en que keyframe está
+
+        """
+        return self.actualKeyframe
+
+    def getMaxKeyframe():
+        """Metodo que devuelve en cual es el ultimo keyframe
+
+        """
+        return self.maxKeyframe
 
 
 #class TriangleBot(BotForVisualization):
