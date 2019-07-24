@@ -19,8 +19,12 @@ class Maze():
         self.grid = None
 
     def saveMaze(self, fname):
-        pass
-
+        size = (len(self.grid), len(self.grid[0]))
+        data = np.zeros(size, dtype=int)
+        for row in range(size[0]):
+            for col in range(size[1]):
+                data[row,col] = int(self.grid[row][col].sumWalls())
+        np.save(fname, data)
     def initMaze(self, size, walls=True):
         """
         Crea la grid de dimensiones dadas por "size".
@@ -97,27 +101,43 @@ class BacktrackingMaze(Maze):
         "start" y "end" son tuplas que pueden especificar
         la posición de la entrada y la salida del laberinto.
         """
+
+        bottom = size[0] -1
+        right = size[1] -1
+        if not start: start = (0,0)
+        if not end: end = (bottom, right)
+
+        total = size[0]*size[1]
         stack = []
-        cell = grid[random.randint(0,bottom)][random.randint[0,right]]
+        cell = self.grid[random.randint(0,bottom)][random.randint(0,right)]
         cell.setVisited(True)
         stack.append(cell)
+        i = 0
         while len(stack) > 0:
-            try: 
-                newcell = chooseNew(self,cell)
-                if not newcell.getVisited():
-                    cell.destroyWall(newcell)
-                    newcell.setVisited(True)
-                    stack.append(newcell)
-                    continue
-                else: 
-                    cell = stack.pop()
-            except: pass
+            print("step:\t{}\tstackLen:\t{}\tpos:\t{}".format(i,len(stack),stack[-1].pos))
+            i += 1
+            newcell = self.chooseNew(cell)
+            if not newcell.getVisited():
+                cell.destroyWall(newcell)
+                newcell.setVisited(True)
+                stack.append(newcell)
+                cell = newcell
+                continue
+            else: 
+                cell = stack.pop()
+        orphans = []
+        for row in self.grid:
+            for cell in row:
+                if cell.getVisited() == False: orphans.append(cell)
+        print("orphans:")
+        print([c.pos for c in orphans])
 
     def chooseNew(self,cell):
         """
         Elige una nueva celda vecina al azar y la devuelve.
         """
-        pass
+        return random.choice(cell.findNeighbours(self.grid, checkVisited=True))
+        
 
 
 
@@ -125,7 +145,9 @@ class BacktrackingMaze(Maze):
 
 
 if __name__ == "__main__":
-    maze = BoxMaze()
-    size = (3,3)
+    maze = BacktrackingMaze()
+    # maze = BoxMaze()
+    size = (10,10)
     maze.initMaze(size)
     maze.buildMaze(size)
+    maze.saveMaze("testname")
