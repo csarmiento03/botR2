@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
 
 class Visualizer(object):
     """Clase que lleva la visualización.
@@ -29,14 +30,19 @@ class Visualizer(object):
         """
         self.mediaFilename = filename
 
-    def showMaze(self):
-        """Grafica el laberinto pelado"""
-
+    def showMaze(self, xkcd=True, colorWall="k", entryColor="palegreen" ,exitColor="lightcoral"):
+        """Grafica el laberinto pelado
+            Argumentos:
+                + xkcd (bool): Habilitar el estilo xkcd. Default:Habilitado
+                + colorWall (str): Color de las paredes del lab. (Default negro)
+                + entryColor (str): Color de la entrada. (Default palegreen)
+                + exitColor (str): Color de la salida. (Default lightcoral)
+        """
         # Crea la figura y el estilo de los ejes
-        tfig = self.configurePlot()
+        tfig = self.configurePlot(xkcd)
 
         # Graficamos las paredes
-        self.plotWalls()
+        self.plotWalls(colorWall, entryColor, exitColor)
 
         # Mostramos el grafico
         plt.show()
@@ -44,16 +50,18 @@ class Visualizer(object):
         # Handle any potential saving
 
 
-    def plotWalls(self):
-        """ Grafica las paredes del laberinto"""
-
+    def plotWalls(self, colorWall="k", entryColor="palegreen" ,exitColor="lightcoral"):
+        """ Grafica las paredes del laberinto
+            Argumentos:
+                + colorWall (str): Color de las paredes del lab. (Default negro)
+                + entryColor (str): Color de la entrada. (Default palegreen)
+                + exitColor (str): Color de la salida. (Default lightcoral)
+        """
         #Obtenemos el numero de fila y columnas tiene el laberinto
         numRows = (self.maze.getRowCol())[0]
         numCol = (self.maze.getRowCol())[1]
         # Y la estructura del laberinto
         mazeStructure = self.maze.getMaze()
-
-        print(mazeStructure)
 
         for i in range(numRows):
             for j in range(numCol):
@@ -64,32 +72,55 @@ class Visualizer(object):
                 # Si hay una pared a la izquierda
                 if mazeStructure[i][j] & 1 > 0:
                     self.ax.plot([indexCol*self.cellSize, indexCol*self.cellSize],
-                                 [indexRow*self.cellSize, (indexRow+1)*self.cellSize], color="k")
+                                 [indexRow*self.cellSize, (indexRow+1)*self.cellSize],
+                                 color=colorWall, linewidth=3)
                 # Si hay una pared a arriba
                 if mazeStructure[i][j] & 2 > 0:
-                    self.ax.plot([j*self.cellSize, (j+1)*self.cellSize],
-                                 [(indexRow+1)*self.cellSize, (indexRow+1)*self.cellSize], color="r")
+                    self.ax.plot([(indexCol+1)*self.cellSize, indexCol*self.cellSize],
+                                 [(indexRow+1)*self.cellSize, (indexRow+1)*self.cellSize],
+                                 color=colorWall, linewidth=3)
                 # Si hay una pared a la derecha
                 if mazeStructure[i][j] & 4 > 0:
                     self.ax.plot([(indexCol+1)*self.cellSize, (indexCol+1)*self.cellSize],
-                                 [indexRow*self.cellSize, (indexRow+1)*self.cellSize], color="b")
+                                 [indexRow*self.cellSize, (indexRow+1)*self.cellSize],
+                                 color=colorWall, linewidth=3)
                 # Si hay una pared abajo
                 if mazeStructure[i][j] & 8 > 0:
                     self.ax.plot([(indexCol+1)*self.cellSize, indexCol*self.cellSize],
-                                 [indexRow*self.cellSize, indexRow*self.cellSize], color="m")
+                                 [indexRow*self.cellSize, indexRow*self.cellSize],
+                                 color=colorWall, linewidth=3)
 
-                #if self.maze.initial_grid[i][j].is_entry_exit == "entry":
-                #    self.ax.text(j*self.cell_size, i*self.cell_size, "START", fontsize=7, weight="bold")
-                #elif self.maze.initial_grid[i][j].is_entry_exit == "exit":
-                #    self.ax.text(j*self.cell_size, i*self.cell_size, "END", fontsize=7, weight="bold")
 
-    def configurePlot(self):
-        """Setea las configuraciones iniciales del plot. Ademas crea el plot y los ejes"""
+        #Graficamos la entrada y salida de laberinto
+        mazeEntry = self.maze.getEntry()
+        xEntry = mazeEntry[1]*self.cellSize
+        yEntry = (numRows - mazeEntry[0] - 1)*self.cellSize
+
+        rectEntry = mpatches.Rectangle((xEntry, yEntry), self.cellSize, self.cellSize,
+                    facecolor=entryColor)
+        self.ax.add_patch(rectEntry)
+
+        mazeExit = self.maze.getExit()
+        xExit = mazeExit[1]*self.cellSize
+        yExit = (numRows - mazeExit[0] - 1)*self.cellSize
+
+        rectExit = mpatches.Rectangle((xExit, yExit), self.cellSize, self.cellSize,
+                    facecolor=exitColor)
+        self.ax.add_patch(rectExit)
+
+    def configurePlot(self, xkcd=True):
+        """Setea las configuraciones iniciales del plot. Ademas crea el plot y los ejes
+            Argumentos:
+                + xkcd (bool): Habilitar un estilo xkcd(). Default:Enable
+        """
 
         numRows = (self.maze.getRowCol())[0]
         numCol = (self.maze.getRowCol())[1]
 
         # Create the plot figure
+        if (xkcd == True):
+            plt.xkcd()
+
         fig = plt.figure(figsize = (7, 7*numRows/numCol))
 
         # Create the axes
@@ -101,10 +132,6 @@ class Visualizer(object):
         # Remove the axes from the figure
         self.ax.axes.get_xaxis().set_visible(False)
         self.ax.axes.get_yaxis().set_visible(False)
-
-        title_box = self.ax.text(0, numRows + numCol + 0.1,
-                            r"{}$\times${}".format(numRows, numCol),
-                            bbox={"facecolor": "gray", "alpha": 0.5, "pad": 4}, fontname="serif", fontsize=15)
 
         return fig
 
@@ -148,9 +175,9 @@ class MazeForVisualization(object):
                     break
                 elif cellValue > 15:
                     if (cellValue & 16 > 0): #Vemos si es una entrada
-                        self.entryCell = [indexRow, indexCol]
+                        self.entryCell = (indexRow, indexCol)
                     if (cellValue & 32 > 0): #Vemos si es una salida
-                        self.exitCell = [indexRow, indexCol]
+                        self.exitCell = (indexRow, indexCol)
                     temp[indexRow][indexCol] = cellValue & 15 #Quitamos la informacion de si es salida o entrada
 
         if (noError == True):

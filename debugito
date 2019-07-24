@@ -1,0 +1,10 @@
+import vis as vis
+
+arch = "lab10.npy"
+laberinto = vis.MazeForVisualization(arch)
+laberinto.loadMazeFile()
+vv = vis.Visualizer(laberinto, 2, "pepe")
+vv.showMaze(xkcd=False)
+
+
+#vv.showMaze(xkcd=False, colorWall="r", entryColor="magenta" ,exitColor="y")
