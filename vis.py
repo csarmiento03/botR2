@@ -104,13 +104,17 @@ class Visualizer(object):
         xExit = mazeExit[1]*self.cellSize
         yExit = (numRows - mazeExit[0] - 1)*self.cellSize
 
+        rectExit = mpatches.Rectangle((xExit, yExit), self.cellSize, self.cellSize,
+                facecolor=exitColor)
+        self.ax.add_patch(rectExit)
+
         for item in self.maze.listOrphans:
             xO = item[1]*self.cellSize
             yO = (numRows - item[0] - 1)*self.cellSize
 
-            rectExit = mpatches.Rectangle((xExit, yExit), self.cellSize, self.cellSize,
+            rectOtr = mpatches.Rectangle((xO, yO), self.cellSize, self.cellSize,
                     facecolor="m")
-            self.ax.add_patch(rectExit)
+            self.ax.add_patch(rectOtr)
 
     def configurePlot(self, xkcd=True):
         """Setea las configuraciones iniciales del plot. Ademas crea el plot y los ejes
@@ -217,68 +221,68 @@ class MazeForVisualization(object):
         """Retorna la posicion de la salida """
         return self.exitCell
 
-class BotForVisualization(object):
+#class BotForVisualization(object):
 
-    """Clase que dibuja el bot que recorre el camino de la simulacion.
+#    """Clase que dibuja el bot que recorre el camino de la simulacion.
+#
+#    Atributos: que lleva la visualización
+#
+#        + path (2-D np.array): Estructura de numpy con el camino recorrido y las orientaciones del bot
+#
+#    """
+#    def __init__(self):
+#
+#        self.path = None
+#
+#    def loadPath(self, filename):
+#        """Metodo que carga el archivo con el camino recorrido por el bot.
+#
+#            Argumentos:
+#                + fileName (string): El archivo donde esta guardado el camino
+#        """
+#
+##            temp = np.load(filename) #Variable temporal que va a guardar el numpy array qeu se obtiene de leer el archivo
+#
+#            noError = True #Flag que indica que se cargo todo correctamente
+#            np.loadtxt(fname, dtype=<class 'float'>, comments='#', delimiter=None, converters=None, skiprows=0, usecols=None, unpack=False, ndmin=0, encoding='bytes', max_rows=None)[source]¶
+#            #Chequeamos que el archivo tiene valores esperados
+#            for indexRow, row in enumerate(temp):
+#                for indexCol, cellValue in enumerate(row):
+#                    if cellValue > 63 or cellValue < 0: #Esto no es un laberinto
+#                        noError = False
+#                        break
+#                    elif cellValue > 15:
+#                        if (cellValue & 16 > 0): #Vemos si es una entrada
+#                            self.entryCell = (indexRow, indexCol)
+#                        if (cellValue & 32 > 0): #Vemos si es una salida
+#                            self.exitCell = (indexRow, indexCol)
+#                        temp[indexRow][indexCol] = cellValue & 15 #Quitamos la informacion de si es salida o entrada
+#
+#            if (noError == True):
+#                self.structure = temp
+#                self.numRows = len(temp)
+#                self.numCols = len(temp[0])
+#                print("Laberinto guardado correctamente")
+#            else:
+#                self.entryCell = None
+#                self.exitCell = None
+#                print("El archself.numRowsivo de entrada no es un archivo valido")
 
-    Atributos: que lleva la visualización
 
-        + path (2-D np.array): Estructura de numpy con el camino recorrido y las orientaciones del bot
+#class TriangleBot(BotForVisualization):
+#
+#    """Clase dibuja el bot que recorre el camino de la simulacion.
 
-    """
-    def __init__(self):
+#    Atributos: que lleva la visualización
+#
+#        + fileName (string): El archivo donde esta guardado el camino
+#        + structure: (2-D np.array) La estructura del laberinto que va a ser visualizado.
+#        + numRows (int): Numero de filas que tiene el laberinto
+#        + numCols (int): Numero de columnas que tiene el laberinto
+#        + entryCell (list): Coordenada de la celda de comienzo del laberinto
+#        + exitCell (list): Coordenada de la celda de salida del laberinto
 
-        self.path = None
-
-    def loadPath(self, filename):
-        """Metodo que carga el archivo con el camino recorrido por el bot.
-
-            Argumentos:
-                + fileName (string): El archivo donde esta guardado el camino
-        """
-
-            temp = np.load(filename) #Variable temporal que va a guardar el numpy array qeu se obtiene de leer el archivo
-
-            noError = True #Flag que indica que se cargo todo correctamente
-            np.loadtxt(fname, dtype=<class 'float'>, comments='#', delimiter=None, converters=None, skiprows=0, usecols=None, unpack=False, ndmin=0, encoding='bytes', max_rows=None)[source]¶
-            #Chequeamos que el archivo tiene valores esperados
-            for indexRow, row in enumerate(temp):
-                for indexCol, cellValue in enumerate(row):
-                    if cellValue > 63 or cellValue < 0: #Esto no es un laberinto
-                        noError = False
-                        break
-                    elif cellValue > 15:
-                        if (cellValue & 16 > 0): #Vemos si es una entrada
-                            self.entryCell = (indexRow, indexCol)
-                        if (cellValue & 32 > 0): #Vemos si es una salida
-                            self.exitCell = (indexRow, indexCol)
-                        temp[indexRow][indexCol] = cellValue & 15 #Quitamos la informacion de si es salida o entrada
-
-            if (noError == True):
-                self.structure = temp
-                self.numRows = len(temp)
-                self.numCols = len(temp[0])
-                print("Laberinto guardado correctamente")
-            else:
-                self.entryCell = None
-                self.exitCell = None
-                print("El archself.numRowsivo de entrada no es un archivo valido")
-
-
-class TriangleBot(BotForVisualization):
-
-    """Clase dibuja el bot que recorre el camino de la simulacion.
-
-    Atributos: que lleva la visualización
-
-        + fileName (string): El archivo donde esta guardado el camino
-        + structure: (2-D np.array) La estructura del laberinto que va a ser visualizado.
-        + numRows (int): Numero de filas que tiene el laberinto
-        + numCols (int): Numero de columnas que tiene el laberinto
-        + entryCell (list): Coordenada de la celda de comienzo del laberinto
-        + exitCell (list): Coordenada de la celda de salida del laberinto
-
-    """
+#    """
     #def __init__(self):
 
     #    self.structure = None
