@@ -237,32 +237,32 @@ class BotForVisualization(object):
             Argumentos:
                 + fileName (string): El archivo donde esta guardado el camino
         """
-            #Variable temporal que va a guardar el numpy array qeu se obtiene de leer el archivo
-            temp = np.loadtxt(filename, dtype=int, comments='#', delimiter=",", skiprows=1 )
 
-            noError = True #Flag que indica que se cargo todo correctamente
+        #Variable temporal que va a guardar el numpy array qeu se obtiene de leer el archivo
+        path = np.loadtxt(filename, dtype=int, comments='#', delimiter=",", skiprows=1)
+        noError = True #Flag que indica que se cargo todo correctamente
 
-            #Si el valor correspondiente a una orientacion no es dato valido (tiene que ser
-            # entre 0 y 3)
-            for row in temp:
-                if row[2] > 3 or row[2] < 0:
-                    noError = False
-                    break
+        #Si el valor correspondiente a una orientacion no es dato valido (tiene que ser
+        # entre 0 y 3)
+        for row in path:
+            if row[2] > 3 or row[2] < 0:
+                noError = False
+                break
 
-            if (noError == True):
-                self.path = path
-                self.pos = (path[0][0], path[0][1])
-                self.orientation = path[0][2]
-                self.maxKeyframe = len(path) - 1
-                self.actualKeyframe = 0
-                print("Camino recorrido del bot guardado correctamente")
-            else:
-                self.path = None
-                self.pos = None
-                self.orientation = None
-                self.maxKeyframe = None
-                self.actualKeyframe = None
-                print("El archivo de entrada no es un archivo valido")
+        if (noError == True):
+            self.path = path
+            self.pos = (path[0][0], path[0][1])
+            self.orientation = path[0][2]
+            self.maxKeyframe = len(path) - 1
+            self.actualKeyframe = 0
+            print("Camino recorrido del bot guardado correctamente")
+        else:
+            self.path = None
+            self.pos = None
+            self.orientation = None
+            self.maxKeyframe = None
+            self.actualKeyframe = None
+            print("El archivo de entrada no es un archivo valido")
 
     def nextKeyframe(self):
         """Metodo que modifica los datos del bots en posicion y orientacion.
@@ -270,28 +270,28 @@ class BotForVisualization(object):
         """
         if (self.actualKeyframe < self.maxKeyframe):
             self.actualKeyframe += 1
-            self.pos = (path[self.path][0], path[self.path][1])
-            self.orientation = self.path[0][2]
+            self.pos = (self.path[self.actualKeyframe][0], self.path[self.actualKeyframe][1])
+            self.orientation = self.path[self.actualKeyframe][2]
 
-    def getPos():
+    def getPos(self):
         """Metodo que devuelve la posicion del bot
 
         """
         return self.pos
 
-    def getOrientation():
+    def getOrientation(self):
         """Metodo que devuelve la orientacion del bot
 
         """
         return self.orientation
 
-    def getActualKeyframe():
+    def getActualKeyframe(self):
         """Metodo que devuelve en que keyframe está
 
         """
         return self.actualKeyframe
 
-    def getMaxKeyframe():
+    def getMaxKeyframe(self):
         """Metodo que devuelve en cual es el ultimo keyframe
 
         """
