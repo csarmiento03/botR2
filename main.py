@@ -1,13 +1,13 @@
 import numpy as np
 import bot as b
-from maze import Maze
+import maze as mz
 
-maze = BacktrackingMaze()
+maze = mz.BacktrackingMaze()
 
 size = (4,4)
 
 maze.initMaze(size)
-mazebuildMaze(size)
+maze.buildMaze(size)
 maze.saveMaze("Prueba 1")
 
 bb8 = b.Bot()
