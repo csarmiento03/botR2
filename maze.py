@@ -10,7 +10,7 @@ from cell import Cell
 
 class Maze():
     """
-    Esta versión genérica solo construlle un laberinto trivial 
+    Esta versión genérica solo construye un laberinto trivial 
     que consiste en una caja con una entrada y una salida.
 
     """
@@ -27,7 +27,7 @@ class Maze():
 
     def getEnd(self):
         return self.end
-        
+
     def getWalls(self, pos):
         try: return self.grid[pos[0]][pos[1]].getWalls()
         except: pass
@@ -95,7 +95,7 @@ class BoxMaze(Maze):
                 if i != 0:
                     self.grid[i][j].wallN = False
 
-        #Implementa la entrada y salida.
+        # Implementa la entrada y salida.
         self.grid[start[0]][start[1]].wallN = False
         self.grid[start[0]][start[1]].start = True
         self.grid[end[0]][end[1]].wallS = False
@@ -135,29 +135,42 @@ class BacktrackingMaze(Maze):
         self.start = start
         self.end = end
 
-        stack = []
         cell = self.grid[random.randint(0,bottom)][random.randint(0,right)]
         cell.setVisited(True)
-        stack.append(cell)
+        stack = [cell]
         i = 0
         while len(stack) > 0:
 
             # TESTING
-            traj = (cell.pos, [c.pos for c in cell.findNeighbours(self.grid)])
-            self.trajectory.append(traj)
-            print("step:\t{}\tstackLen:\t{}\tpos:\t{}".format(i,len(stack),stack[-1].pos))
-            i += 1
+            # traj = (cell.pos, [c.pos for c in cell.findNeighbours(self.grid)])
+            # self.trajectory.append(traj)
+            # print("step:\t{}\tstackLen:\t{}\tpos:\t{}".format(i,len(stack),stack[-1].pos))
+            # i += 1
 
             # LOGIC
-            newcell = self.chooseNew(cell)
-            if not newcell.getVisited():
-                stack.append(newcell)
-                newcell.setVisited(True)
-                cell.destroyWall(newcell)
-                cell = newcell
-                continue
-            else: 
+            try:
+                newcell = self.chooseNew(cell)
+                if newcell.getVisited():
+                    # print(cell.pos, "Already Visited! >:[")
+                    cell = stack.pop()
+                else:
+                    cell.destroyWall(newcell)  
+                    newcell.setVisited(True)
+                    cell = newcell
+                    stack.append(newcell)
+
+            except Exception as exc:
+                # print(cell, exc)
                 cell = stack.pop()
+
+            # if not newcell.getVisited():
+            #     stack.append(newcell)
+            #     newcell.setVisited(True)
+            #     cell.destroyWall(newcell)
+            #     cell = newcell
+            #     continue
+            # else: 
+            #     cell = stack.pop()
 
 
         for row in self.grid:
@@ -173,8 +186,13 @@ class BacktrackingMaze(Maze):
         """
         Elige una nueva celda vecina al azar y la devuelve.
         """
-        return random.choice(cell.findNeighbours(self.grid, checkVisited=True))
-        
+        options = cell.findNeighbours(self.grid, checkVisited=True)
+        for i in options:
+            if i.getVisited() != False:
+                options.remove(i)
+        if len(options) > 0: return random.choice(options)
+        else: raise Exception("no unvisited neighbours")
+
 
 
 
@@ -184,7 +202,7 @@ class BacktrackingMaze(Maze):
 if __name__ == "__main__":
     maze = BacktrackingMaze()
     # maze = BoxMaze()
-    size = (5,5)
+    size = (10,25)
     maze.initMaze(size)
     maze.buildMaze(size)
     maze.saveMaze("testname")
