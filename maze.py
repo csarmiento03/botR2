@@ -22,8 +22,15 @@ class Maze():
         self.orphans = []
         self.trajectory = []
 
-    def getWalls(self, pos)
-        return self.grid[pos[0]][pos[1]].getWalls()
+    def getStart(self):
+        return self.start
+
+    def getEnd(self):
+        return self.end
+        
+    def getWalls(self, pos):
+        try: return self.grid[pos[0]][pos[1]].getWalls()
+        except: pass
 
     def saveMaze(self, fname):
         size = (len(self.grid), len(self.grid[0]))
@@ -134,10 +141,14 @@ class BacktrackingMaze(Maze):
         stack.append(cell)
         i = 0
         while len(stack) > 0:
+
+            # TESTING
             traj = (cell.pos, [c.pos for c in cell.findNeighbours(self.grid)])
             self.trajectory.append(traj)
             print("step:\t{}\tstackLen:\t{}\tpos:\t{}".format(i,len(stack),stack[-1].pos))
             i += 1
+
+            # LOGIC
             newcell = self.chooseNew(cell)
             if not newcell.getVisited():
                 stack.append(newcell)

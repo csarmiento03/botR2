@@ -70,16 +70,7 @@ class Cell(object):
         """    
 
         neighbours = []
-        # try: neighbours.append(grid[self.pos[0]+1][self.pos[1]])
-        # except: pass
-        # try: neighbours.append(grid[self.pos[0]-1][self.pos[1]])
-        # except: pass
-        # try: neighbours.append(grid[self.pos[1]+1][self.pos[0]])
-        # except: pass
-        # try: neighbours.append(grid[self.pos[1]-1][self.pos[0]])
-        # except: pass
-
-        # Lo de arriba, pero reimplementado en menos lineas y corregido error en los índices!
+        # Define los indices de los posibles vecinos e intenta indexarlos.
         tries = [(self.pos[0]+1, self.pos[1]), (self.pos[0]-1, self.pos[1]),
                 (self.pos[0], self.pos[1]+1), (self.pos[0], self.pos[1]-1)]
         for t in tries:
@@ -87,10 +78,10 @@ class Cell(object):
                 try: neighbours.append(grid[t[0]][t[1]])
                 except: pass
 
+        # Desindexa los vecinos que ya han sido visitados.
         if checkVisited:
             for i in neighbours:
-                if i.getVisited():
-                    neighbours.remove(i)
+                if i.getVisited(): neighbours.remove(i)
         print([n.pos for n in neighbours])
         return neighbours
  
