@@ -2,6 +2,10 @@ import numpy as np
 import bot as b
 import maze as mz
 
+#=======================================================================================
+#                                Funciones
+#=======================================================================================
+                       
 def orientation2int(orientation):
     """
     Convierte el vector 'bot.orientation' en un entero codificado.
@@ -26,29 +30,41 @@ def saveTrajectory(traj, fname):
         tfile.writelines(line.format(*fields))
     tfile.close()
 
-#Inicializa variables y objetos necesarios para la simulación.
-traj = []
+#=======================================================================================
+#         Inicialización de variables y objetos necesarios para la simulación.
+#=======================================================================================       
 
-size = (20,20)
 
+#--------------------Creación del Laberinto y variables--------------------------------- 
+
+size = (20,20)                                       
 maze = mz.BacktrackingMaze(size)
 maze.buildMaze()
 maze.saveMaze("laberinto")
 
+mazeEnd = np.array(maze.getEnd())
+
+#-----------------Creación del Robot y variables----------------------------------------
+
 bb8 = b.Bot()
 
-mazeEnd = np.array(maze.getEnd())
+traj = []         #Trayectoria del Robot
+
+
 botPosition = np.array(maze.getStart())
 botOrientation = bb8.getOrientation()
 
-botInformation = [botPosition,botOrientation]   
+
+#=======================================================================================
+#                               Resolución             
+#=======================================================================================
 
 solved = False
 
 steps = 0
 
-#---------------------------------------------------------------
 while solved == False:
+
 
     traj.append((botPosition[0], botPosition[1], botOrientation))
 
@@ -59,7 +75,11 @@ while solved == False:
     botOrientation = bb8.getOrientation()    
 
     aux = np.nonzero(botOrientation)[0][0]
-#   ---------------------------------------------
+
+
+#   Actualización de la posición del robot
+
+ 
     if aux == 0:
         
         botPosition[1] -= 1
@@ -75,11 +95,12 @@ while solved == False:
     elif aux == 3:
 
         botPosition[0] += 1
-#   ----------------------------------------------    
-    
-    botInformation = [botPosition,botOrientation]  
+
+
+#   Condiciones de éxito y fracaso 
     
     steps += 1
+
     
     if botPosition[0] == mazeEnd[0] and botPosition[1] == mazeEnd[1]:
 
@@ -92,9 +113,10 @@ while solved == False:
         print("Me perdí !! Estoy perdido en la facultad de químicas")
         
         break
-    
+
+
 print("Hice",steps,"pasos")
-#---------------------------------------------------------------------
+
 
 traj.append((botPosition[0], botPosition[1], botOrientation))
 
