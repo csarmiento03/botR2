@@ -48,7 +48,7 @@ class Visualizer(object):
             col = self.bot.getPos()[1]
             numRows = (self.maze.getRowCol())[0]
             row = (numRows - self.bot.getPos()[0] - 1)
-
+            print("Cuadro " + str(i) + " de " + str(self.bot.getMaxFrame()))
             # Dibujamos el bot
             self.bot.drawBot(row, col, self.bot.getOrientation(), self.cellSize, self.ax)
             #Avanzamos un cuadro al bot para la siguiente iteracion
