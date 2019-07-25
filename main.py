@@ -2,7 +2,29 @@ import numpy as np
 import bot as b
 import maze as mz
 
-size = (20,20)
+def orientation2int(orientation):
+    index = int(np.nonzero(orientation)[0])
+    if index == 0: return 1
+    elif index == 1: return 0
+    elif index == 2: return 3
+    elif index == 3: return 2
+    else: raise Exception()
+
+def saveTrajectory(traj, fname):
+    """
+    Saves the trajectory of a bot stored in 'traj' into 'fname'.
+    traj must be a list of tuples, containing the pos and orientation vectors.
+    """
+    tfile = open(fname, "w")
+    line = "{}, {}, {}\n"
+    for step in traj:
+        fields = [*step[0], orientation2int(step[1])]
+        tfile.writelines(line.format(*fields))
+    tfile.close()
+
+traj = []
+
+size = (4,4)
 
 maze = mz.BacktrackingMaze(size)
 maze.buildMaze()
@@ -30,6 +52,7 @@ steps = 0
 #---------------------------------------------------------------
 while solved == False:
 
+    traj.append((botPosition, botOrientation))
 
     bb8.detect(maze.getWalls(botPosition))
     
@@ -84,6 +107,37 @@ print("Hice",steps,"pasos")
 #---------------------------------------------------------------------
 
 f.close()
+
+saveTrajectory(traj, "trajtest.traj")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
