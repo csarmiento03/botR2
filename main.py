@@ -3,6 +3,10 @@ import bot as b
 import maze as mz
 
 def orientation2int(orientation):
+    """
+    Convierte el vector 'bot.orientation' en un entero codificado.
+    El código está explicado en 'doc.md'.
+    """
     index = int(np.nonzero(orientation)[0])
     if index == 0: return 1
     elif index == 1: return 0
@@ -11,14 +15,18 @@ def orientation2int(orientation):
     else: raise Exception()
 
 def saveTrajectory(traj, fname):
-
+    """
+    Guarda la trayectoria de un robot almacenada en 'traj' en un archivo 'fname'.
+    El formato de archivo está explicado en 'doc.md'.
+    """
     tfile = open(fname, "w")
     line = "{}, {}, {}\n"
     for step in traj:
-        fields = [*step[0], orientation2int(step[1])]
+        fields = [step[0], step[1], orientation2int(step[2])]
         tfile.writelines(line.format(*fields))
     tfile.close()
 
+#Inicializa variables y objetos necesarios para la simulación.
 traj = []
 
 size = (4,4)
@@ -42,7 +50,7 @@ steps = 0
 #---------------------------------------------------------------
 while solved == False:
 
-    traj.append((botPosition, botOrientation))
+    traj.append((botPosition[0], botPosition[1], botOrientation))
 
     bb8.detect(maze.getWalls(botPosition))
     
@@ -88,8 +96,7 @@ while solved == False:
 print("Hice",steps,"pasos")
 #---------------------------------------------------------------------
 
-f.close()
-
+traj.append((botPosition[0], botPosition[1], botOrientation))
 saveTrajectory(traj, "bb8.traj")
 
 
