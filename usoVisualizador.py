@@ -1,18 +1,18 @@
 import vis as vis
 
 # Configuraciones
-mediaFilename="resolucion2"  #Nombre que va a guardar los archivos
+mediaFilename="resolucion20x20"  #Nombre que va a guardar los archivos
 
 fotoLaberintoPelado = True  #Habilita el guardado de la foto del laberinto pelado
 fotoCaminoBot = True        #Habilita el guardado de la foto del laberinto con el camino del bot
-fotoBotEnAlgunLado = True   #Habilita el guardado de la foto del laberinto con el bot en algun punto
+fotoBotEnAlgunLado = False   #Habilita el guardado de la foto del laberinto con el bot en algun punto
 frameBotEnAlgunLado = 0     #Cuadro que se quiere sacar foto
 video = True                #Habilita el guardado del video
 fps=10                      #Cuadros por segundos para el video
 
 robot = True
-archMaze = "lab10.txt"      #Archivo de laberinto
-archBot = "botpath.txt"     #Archivo de camino de bot
+archMaze = "laberinto"      #Archivo de laberinto
+archBot = "bb8.traj"     #Archivo de camino de bot
 
 cellSize = 2                #Tamaño de las celdas del laberinto
 xkcd = True                 #Habilita forma xkcd

@@ -31,7 +31,10 @@ class Bot(object):
         Siempre quedara apuntando a una direccion en la que no haya una pared.
         Primero verificara si delante suyo hay pared. Si no hay, se quedara 
         en esa posicion. Luego, intentara hacia su derecha, luego a su izquierda
-        y por ultimo hacia atras."""
+        y por ultimo hacia atras.
+        Este algoritmo fue el primero que implementamos, y resultó rápido pero 
+        poco efectivo ya que en situaciones particulares no encontraba 
+        la salida."""
 
         aux = np.nonzero(self.orientation)[0][0]
 
@@ -53,6 +56,15 @@ class Bot(object):
                 self.orientation[aux-2] = 1
 
     def decide2(self):
+
+        """Cambia la orientacion del robot segun lo que indique su sensor.
+        Siempre quedara apuntando a una direccion en la que no haya una pared.
+        Primero verificara si a su derecha hay pared. Si no hay, girará a esa 
+        posicion. Luego, intentara hacia adelante, luego a su izquierda
+        y por ultimo hacia atras.
+        La implementación de este algoritmo resultó mucho más efectiva que 
+        la anterior."""
+        
         aux = np.nonzero(self.orientation)[0][0]
 
         if self.sensor[aux-3] == 0:
