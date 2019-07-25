@@ -22,7 +22,7 @@ def saveTrajectory(traj, fname):
     tfile = open(fname, "w")
     line = "{}, {}, {}\n"
     for step in traj:
-        fields = [*step[0], orientation2int(step[1])]
+        fields = [step[0], step[1], orientation2int(step[2])]
         tfile.writelines(line.format(*fields))
     tfile.close()
 
@@ -50,7 +50,7 @@ steps = 0
 #---------------------------------------------------------------
 while solved == False:
 
-    traj.append((botPosition, botOrientation))
+    traj.append((botPosition[0], botPosition[1], botOrientation))
 
     bb8.detect(maze.getWalls(botPosition))
     
@@ -96,8 +96,7 @@ while solved == False:
 print("Hice",steps,"pasos")
 #---------------------------------------------------------------------
 
-f.close()
-
+traj.append((botPosition[0], botPosition[1], botOrientation))
 saveTrajectory(traj, "bb8.traj")
 
 
