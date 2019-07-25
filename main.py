@@ -11,10 +11,7 @@ def orientation2int(orientation):
     else: raise Exception()
 
 def saveTrajectory(traj, fname):
-    """
-    Saves the trajectory of a bot stored in 'traj' into 'fname'.
-    traj must be a list of tuples, containing the pos and orientation vectors.
-    """
+
     tfile = open(fname, "w")
     line = "{}, {}, {}\n"
     for step in traj:
@@ -39,13 +36,6 @@ botOrientation = bb8.getOrientation()
 botInformation = [botPosition,botOrientation]   
 
 solved = False
-
-
-f = open("Bb8.traj","w+") 
-
-#np.save( "Bb8.traj" ,botPosition)
-
-f.writelines("{}\t{}\n".format(botPosition,botOrientation))
 
 steps = 0
 
@@ -81,12 +71,7 @@ while solved == False:
     
     botInformation = [botPosition,botOrientation]  
     
-    
-    #np.savetxt( "Bb8.traj" , botPosition[0])
-    
     steps += 1
-
-    f.writelines("{}\t{}\n".format(botPosition,botOrientation))
     
     if botPosition[0] == mazeEnd[0] and botPosition[1] == mazeEnd[1]:
 
@@ -96,19 +81,16 @@ while solved == False:
 
     if steps>=1000:
 
-        print("Me perdí !! Estoy perdido, estoy en la facultad de químicas")
+        print("Me perdí !! Estoy perdido en la facultad de químicas")
         
         break
-
-#    while solved == False:
-#        pass
     
 print("Hice",steps,"pasos")
 #---------------------------------------------------------------------
 
 f.close()
 
-saveTrajectory(traj, "trajtest.traj")
+saveTrajectory(traj, "bb8.traj")
 
 
 
