@@ -2,18 +2,18 @@ import numpy as np
 import bot as b
 import maze as mz
 
-maze = mz.BacktrackingMaze()
-
 size = (4,4)
 
-maze.initMaze(size)
-maze.buildMaze(size)
+maze = mz.BacktrackingMaze(size)
+
+#maze.initMaze(size)
+maze.buildMaze()
 maze.saveMaze("Prueba 1")
 
 bb8 = b.Bot()
 
-mazeEnd = maze.getEnd()
-botPosition = maze.getStart()
+mazeEnd = np.array(maze.getEnd())
+botPosition = np.array(maze.getStart())
 botOrientation = bb8.getOrientation()
 
 botInformation = [botPosition,botOrientation]   
@@ -23,7 +23,7 @@ solved = False
 
 f = open("Bb8.traj","w+") 
 
-np.savetxt( "Bb8.traj" , botInformation)
+np.save( "Bb8.traj" ,botPosition[0])
 
 steps = 0
 
@@ -59,35 +59,26 @@ while solved == False:
     botInformation = [botPosition,botOrientation]  
     
     
-    np.savetxt( "Bb8.traj" , botInformation)
-
+    np.savetxt( "Bb8.traj" , botPosition[0])
+    
     steps += 1
-
-    if botPosition == mazeEnd:
+    
+    if botPosition[0] == mazeEnd[0] and botPosition[1] == mazeEnd[1]:
 
         solved = True
         
         print("El robot ha salido del laberinto exitosamente !! :D")
 
-    if steps>100:
+    if steps>=100:
 
-        break
-        
         print("Me perdí !! Estoy perdido, estoy en la facultad de químicas")
+        
+        break
 
+print("Hice",steps,"pasos")
 #---------------------------------------------------------------------
 
 f.close()
-
-
-
-
-
-
-
-
-
-
 
 
 

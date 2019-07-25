@@ -199,8 +199,8 @@ class BacktrackingMaze(Maze):
 
 
 
-if __name__ == "__main__":
-    size = (10,25)
-    maze = BacktrackingMaze(size)
-    maze.buildMaze()
-    maze.saveMaze("testname")
+#if __name__ == "__main__":
+#    size = (10,25)
+#    maze = BacktrackingMaze(size)
+#   maze.buildMaze()
+#    maze.saveMaze("testname")

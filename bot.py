@@ -33,27 +33,21 @@ class Bot(object):
         en esa posicion. Luego, intentara hacia su derecha, luego a su izquierda
         y por ultimo hacia atras."""
 
-        if self.sensor[np.nonzero(self.orientation)[0][0]] == 0:
-            
-            pass
+        aux = np.nonzero(self.orientation)[0][0]
         
-        else:
+        if self.sensor[aux-3] == 0:
             
-            aux = np.nonzero(self.orientation)[0][0]
+            self.orientation = np.zeros(4)
+            self.orientation[aux-3] = 1
             
-            if self.sensor[aux-3] == 0:
-                
-                self.orientation = np.zeros(4)
-                self.orientation[aux-3] = 1
-                
-            elif self.sensor[aux-1] == 0:
-                
-                self.orientation = np.zeros(4)
-                self.orientation[aux-1] = 1
-            elif self.sensor[aux-2] == 0:
-                
-                self.orientation = np.zeros(4)
-                self.orientation[aux-2] = 1
+        elif self.sensor[aux-1] == 0:
+            
+            self.orientation = np.zeros(4)
+            self.orientation[aux-1] = 1
+        elif self.sensor[aux-2] == 0:
+            
+            self.orientation = np.zeros(4)
+            self.orientation[aux-2] = 1
 
     def getOrientation(self):
         
