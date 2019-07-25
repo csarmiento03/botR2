@@ -2,7 +2,7 @@ import numpy as np
 import bot as b
 import maze as mz
 
-size = (4,4)
+size = (20,20)
 
 maze = mz.BacktrackingMaze(size)
 maze.buildMaze()
@@ -21,7 +21,9 @@ solved = False
 
 f = open("Bb8.traj","w+") 
 
-#np.save( "Bb8.traj" ,botPosition[0])
+#np.save( "Bb8.traj" ,botPosition)
+
+f.writelines("{}\t{}\n".format(botPosition,botOrientation))
 
 steps = 0
 
@@ -31,7 +33,7 @@ while solved == False:
 
     bb8.detect(maze.getWalls(botPosition))
     
-    bb8.decide()
+    bb8.decide2()
 
     botOrientation = bb8.getOrientation()    
 
@@ -61,7 +63,7 @@ while solved == False:
     
     steps += 1
 
-    print(botPosition)
+    f.writelines("{}\t{}\n".format(botPosition,botOrientation))
     
     if botPosition[0] == mazeEnd[0] and botPosition[1] == mazeEnd[1]:
 
@@ -69,12 +71,15 @@ while solved == False:
         
         print("El robot ha salido del laberinto exitosamente !! :D")
 
-    if steps>=100:
+    if steps>=1000:
 
         print("Me perdí !! Estoy perdido, estoy en la facultad de químicas")
         
         break
 
+#    while solved == False:
+#        pass
+    
 print("Hice",steps,"pasos")
 #---------------------------------------------------------------------
 
