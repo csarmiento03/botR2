@@ -22,7 +22,7 @@ class Maze():
                tendrán las paredes activas por defecto o no.
     """
 
-    def __init__(self, size, walls):
+    def __init__(self, size, walls=True):
         self.size = size
         self.start = (0,0)
         self.end = (0,0)
@@ -92,9 +92,9 @@ class BoxMaze(Maze):
         bottom = size[0] -1
         right = size[1] -1
         if start != False: self.start = start
-        else: self.start = start
-        if end != False: end = (bottom, right)
-        else: self.end = end
+        else: self.start = (0,0)
+        if end != False: self.end = end
+        else: self.end = (bottom, right)
 
 
 
@@ -148,9 +148,9 @@ class BacktrackingMaze(Maze):
         size = self.size
         bottom = size[0] -1
         right = size[1] -1
-        if start != False: self.start = start
+        if start == False: self.start = (0,0)
         else: self.start = start
-        if end != False: end = (bottom, right)
+        if end == False: end = (bottom, right)
         else: self.end = end
 
         # Elige una celda inicial al azar.
@@ -177,8 +177,8 @@ class BacktrackingMaze(Maze):
 
         # Agrega la entrada y la salida al laberinto.
         #implementación TRIVIAL!
-        self.grid[start[0]][start[1]].wallS = False
-        self.grid[end[0]][end[1]].wallN = False
+        self.grid[self.start[0]][self.start[1]].wallS = False
+        self.grid[self.end[0]][self.end[1]].wallN = False
 
 
 
@@ -201,6 +201,6 @@ class BacktrackingMaze(Maze):
 
 if __name__ == "__main__":
     size = (10,25)
-    maze = BacktrackingMaze(size, True)
+    maze = BacktrackingMaze(size)
     maze.buildMaze()
     maze.saveMaze("testname")
