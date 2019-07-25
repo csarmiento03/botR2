@@ -91,10 +91,14 @@ class BoxMaze(Maze):
         size = self.size
         bottom = size[0] -1
         right = size[1] -1
-        if start != False: self.start = start
-        else: self.start = (0,0)
-        if end != False: self.end = end
-        else: self.end = (bottom, right)
+        if start == False:
+            self.start = (0,0)
+            start = self.start
+        else: self.start = start
+        if end == False:
+            self.end = (bottom, right)
+            end = self.end
+        else: self.end = end
 
 
 
@@ -175,15 +179,8 @@ class BacktrackingMaze(Maze):
                     newcell.setVisited(True)
                     cell = newcell
                     stack.append(newcell)
-
             except :
                 cell = stack.pop()
-
-        # Agrega la entrada y la salida al laberinto.
-        #implementación TRIVIAL!
-        # self.grid[self.start[0]][self.start[1]].wallS = False
-        #self.grid[self.end[0]][self.end[1]].wallN = False
-
 
 
     def chooseNew(self,cell):
@@ -197,14 +194,5 @@ class BacktrackingMaze(Maze):
         if len(options) > 0: return random.choice(options)
         else: raise Exception("no unvisited neighbours")
 
-
-
-
-
-
-
-#if __name__ == "__main__":
-#    size = (10,25)
-#    maze = BacktrackingMaze(size)
-#   maze.buildMaze()
-#    maze.saveMaze("testname")
+if __name__ == "__main__":
+    pass
