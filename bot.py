@@ -34,21 +34,24 @@ class Bot(object):
         y por ultimo hacia atras."""
 
         aux = np.nonzero(self.orientation)[0][0]
-        
-        if self.sensor[aux-3] == 0:
-            
-            self.orientation = np.zeros(4)
-            self.orientation[aux-3] = 1
-            
-        elif self.sensor[aux-1] == 0:
-            
-            self.orientation = np.zeros(4)
-            self.orientation[aux-1] = 1
-        elif self.sensor[aux-2] == 0:
-            
-            self.orientation = np.zeros(4)
-            self.orientation[aux-2] = 1
 
+        if self.sensor[aux] == 0:
+            pass
+        else:
+            if self.sensor[aux-3] == 0:
+                
+                self.orientation = np.zeros(4)
+                self.orientation[aux-3] = 1
+                
+            elif self.sensor[aux-1] == 0:
+                
+                self.orientation = np.zeros(4)
+                self.orientation[aux-1] = 1
+            elif self.sensor[aux-2] == 0:
+                
+                self.orientation = np.zeros(4)
+                self.orientation[aux-2] = 1
+                
     def getOrientation(self):
         
         """Metodo para obtener el atributo orientation"""

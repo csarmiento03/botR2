@@ -5,10 +5,8 @@ import maze as mz
 size = (4,4)
 
 maze = mz.BacktrackingMaze(size)
-
-#maze.initMaze(size)
 maze.buildMaze()
-maze.saveMaze("Prueba 1")
+maze.saveMaze("laberinto")
 
 bb8 = b.Bot()
 
@@ -23,7 +21,7 @@ solved = False
 
 f = open("Bb8.traj","w+") 
 
-np.save( "Bb8.traj" ,botPosition[0])
+#np.save( "Bb8.traj" ,botPosition[0])
 
 steps = 0
 
@@ -59,9 +57,11 @@ while solved == False:
     botInformation = [botPosition,botOrientation]  
     
     
-    np.savetxt( "Bb8.traj" , botPosition[0])
+    #np.savetxt( "Bb8.traj" , botPosition[0])
     
     steps += 1
+
+    print(botPosition)
     
     if botPosition[0] == mazeEnd[0] and botPosition[1] == mazeEnd[1]:
 

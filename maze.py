@@ -148,9 +148,13 @@ class BacktrackingMaze(Maze):
         size = self.size
         bottom = size[0] -1
         right = size[1] -1
-        if start == False: self.start = (0,0)
+        if start == False:
+            self.start = (0,0)
+            start = self.start
         else: self.start = start
-        if end == False: end = (bottom, right)
+        if end == False:
+            self.end = (bottom, right)
+            end = self.end
         else: self.end = end
 
         # Elige una celda inicial al azar.
@@ -177,8 +181,8 @@ class BacktrackingMaze(Maze):
 
         # Agrega la entrada y la salida al laberinto.
         #implementación TRIVIAL!
-        self.grid[self.start[0]][self.start[1]].wallS = False
-        self.grid[self.end[0]][self.end[1]].wallN = False
+        # self.grid[self.start[0]][self.start[1]].wallS = False
+        #self.grid[self.end[0]][self.end[1]].wallN = False
 
 
 
