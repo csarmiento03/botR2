@@ -97,7 +97,7 @@ class Visualizer(object):
         # Mostramos el grafico
         file = self.mediaFilename + "_maze.png"
         plt.savefig(file)
-        plt.show()
+        #plt.show()
 
     def showMazeWithBot(self, frame=0, xkcd=True, colorWall="k", entryColor="palegreen" ,exitColor="lightcoral"):
         """Grafica el laberinto con el bot en la posicion que esta el bot
@@ -129,7 +129,7 @@ class Visualizer(object):
         # Mostramos el grafico
         file = self.mediaFilename + "_frame" + str(frame) +".png"
         plt.savefig(file)
-        plt.show()
+        #plt.show()
 
 
 
@@ -159,7 +159,7 @@ class Visualizer(object):
         # Mostramos el grafico
         file = self.mediaFilename + "_resolution.png"
         plt.savefig(file)
-        plt.show()
+        #plt.show()
 
         # Lo movemos de vuelva al inicio
         self.bot.gotoSpecificFrame(frame=0)
