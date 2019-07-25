@@ -48,7 +48,13 @@ class Visualizer(object):
             col = self.bot.getPos()[1]
             numRows = (self.maze.getRowCol())[0]
             row = (numRows - self.bot.getPos()[0] - 1)
-            print("Cuadro " + str(i) + " de " + str(self.bot.getMaxFrame()))
+
+            if i == self.bot.getMaxFrame()//4:
+                print("25%")
+            if i == self.bot.getMaxFrame()//2:
+                print("50%")
+            if i == (3*self.bot.getMaxFrame())//4:
+                print("75%")
             # Dibujamos el bot
             self.bot.drawBot(row, col, self.bot.getOrientation(), self.cellSize, self.ax)
             #Avanzamos un cuadro al bot para la siguiente iteracion
@@ -67,7 +73,9 @@ class Visualizer(object):
         anim = animation.FuncAnimation(fig, updatefig, self.bot.getMaxFrame())
         #Guardamos la animacion
         file = self.mediaFilename + ".mp4"
+
         anim.save(file, fps=fps)
+        print("Listo")
 
         # Lo movemos de vuelva al inicio
         self.bot.gotoSpecificFrame(frame=0)
@@ -89,7 +97,7 @@ class Visualizer(object):
         # Mostramos el grafico
         file = self.mediaFilename + "_maze.png"
         plt.savefig(file)
-        plt.show()
+        #plt.show()
 
     def showMazeWithBot(self, frame=0, xkcd=True, colorWall="k", entryColor="palegreen" ,exitColor="lightcoral"):
         """Grafica el laberinto con el bot en la posicion que esta el bot
@@ -121,7 +129,7 @@ class Visualizer(object):
         # Mostramos el grafico
         file = self.mediaFilename + "_frame" + str(frame) +".png"
         plt.savefig(file)
-        plt.show()
+        #plt.show()
 
 
 
@@ -151,7 +159,7 @@ class Visualizer(object):
         # Mostramos el grafico
         file = self.mediaFilename + "_resolution.png"
         plt.savefig(file)
-        plt.show()
+        #plt.show()
 
         # Lo movemos de vuelva al inicio
         self.bot.gotoSpecificFrame(frame=0)
