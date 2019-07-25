@@ -131,4 +131,6 @@ for indexrow, row in enumerate(cell):
 matrix[0,4] = matrix[0,4] + 16
 matrix[9,5] = matrix[9,5] + 32
 
-np.save("lab10", matrix.astype(int))
+#matrix2 = matrix.astype(int)
+#np.save("lab10", matrix.astype(int))
+np.savetxt('lab11.txt', matrix, delimiter=',', fmt="%d")

@@ -11,8 +11,6 @@ class Visualizer(object):
 
         + maze (obj mazeForVisualization): Objeto de laberinto que va a ser visualizado.
         + bot (obj hijos de BotForVisualization): Objeto del bot que va a ser visualizado.
-        + deltaTime (int): Delta de tiempo que se va ejecutar cada cuadro de la simulacion
-        + smoother (int): Numero que indica cuantos cuadros habra entre cada keyframe.
         + cellSize (int): Que tan grande va a ser el laberinto
         + height (int): El largo del laberinto
         + width (int): El ancho del laberinto
@@ -21,38 +19,58 @@ class Visualizer(object):
 
     """
 
-    def __init__(self, maze, bot, cellSize, deltaTime, smoother, mediaFilename):
+    def __init__(self, maze, bot, cellSize, mediaFilename="resolucion"):
         self.maze = maze
         self.bot = bot
         self.cellSize = cellSize
         self.height = (maze.getRowCol())[0] * cellSize
         self.width = (maze.getRowCol())[1] * cellSize
+        self.mediaFilename = mediaFilename
         self.ax = None
 
-    def animator(self, mazeTuple=(True, "k", "palegreen", "lightcoral")):
-
-
+    def animator(self, mazeTuple=(True, "k", "palegreen", "lightcoral"), fps=15):
+        """Generador del video de la animacion
+            Argumentos:
+                + mazeTuple (tupla): Tupla para configurar los detalles esteticos del laberinto
+                    + Pos0 - xkcd (bool): Habilitar el estilo xkcd. Default:Habilitado
+                    + Pos1 - colorWall (str): Color de las paredes del lab. (Default negro)
+                    + Pos2 - entryColor (str): Color de la entrada. (Default palegreen)
+                    + Pos3 - exitColor (str): Color de la salida. (Default lightcoral)
+                + fps (int): Cuadros por segundo de animacion
+        """
+        #Funcion interna para generar el video
         def updatefig(i):
 
-            fig.clear()
+            #Borra el robot
+            self.bot.removeBot(self.ax)
 
-            aa = self.configurePlot(createFigure=False, xkcd=mazeTuple[0])
-
-            # Graficamos las paredes
-            self.plotWalls(colorWall=mazeTuple[1], entryColor=mazeTuple[2], exitColor=mazeTuple[3])
-
+            #Ubicamos al robot
             col = self.bot.getPos()[1]
             numRows = (self.maze.getRowCol())[0]
             row = (numRows - self.bot.getPos()[0] - 1)
+
+            # Dibujamos el bot
             self.bot.drawBot(row, col, self.bot.getOrientation(), self.cellSize, self.ax)
-            self.bot.nextKeyframe()
+            #Avanzamos un cuadro al bot para la siguiente iteracion
+            self.bot.nextFrame()
+
             plt.draw()
 
-        fig = self.configurePlot(createFigure=True, xkcd=mazeTuple[0])
-        anim = animation.FuncAnimation(fig, updatefig, self.bot.getMaxKeyframe()+20)
-        anim.save("test.mp4", fps=3)
 
+        # Configuracion
+        fig = self.configurePlot(xkcd=mazeTuple[0])
+        # Graficamos las paredes
+        self.plotWalls(colorWall=mazeTuple[1], entryColor=mazeTuple[2], exitColor=mazeTuple[3])
+        # Graficamos el bot por primera vez en cualquier lado
+        self.bot.drawBot(0, 0, 0, self.cellSize, self.ax)
+        #Animamos usando la funcion updatefig()
+        anim = animation.FuncAnimation(fig, updatefig, self.bot.getMaxFrame())
+        #Guardamos la animacion
+        file = self.mediaFilename + ".mp4"
+        anim.save(file, fps=fps)
 
+        # Lo movemos de vuelva al inicio
+        self.bot.gotoSpecificFrame(frame=0)
 
     def showMaze(self, xkcd=True, colorWall="k", entryColor="palegreen" ,exitColor="lightcoral"):
         """Grafica el laberinto pelado
@@ -63,20 +81,80 @@ class Visualizer(object):
                 + exitColor (str): Color de la salida. (Default lightcoral)
         """
         # Crea la figura y el estilo de los ejes
-        fig = self.configurePlot(xkcd)
+        fig = self.configurePlot(xkcd=xkcd)
 
         # Graficamos las paredes
         self.plotWalls(colorWall, entryColor, exitColor)
 
-        #col = self.bot.getPos()[1]
-        #numRows = (self.maze.getRowCol())[0]
-        #row = (numRows - self.bot.getPos()[0] - 1)
-
-        #self.bot.drawBot(row, col, self.bot.getOrientation(), self.cellSize, self.ax)
-
         # Mostramos el grafico
+        file = self.mediaFilename + "_maze.png"
+        plt.savefig(file)
         plt.show()
 
+    def showMazeWithBot(self, frame=0, xkcd=True, colorWall="k", entryColor="palegreen" ,exitColor="lightcoral"):
+        """Grafica el laberinto con el bot en la posicion que esta el bot
+            Argumentos:
+                + frame (int) : En que cuadro se quiere dibujar el bot
+                + xkcd (bool): Habilitar el estilo xkcd. Default:Habilitado
+                + colorWall (str): Color de las paredes del lab. (Default negro)
+                + entryColor (str): Color de la entrada. (Default palegreen)
+                + exitColor (str): Color de la salida. (Default lightcoral)
+        """
+        # Crea la figura y el estilo de los ejes
+        fig = self.configurePlot(xkcd=xkcd)
+
+        # Graficamos las paredes
+        self.plotWalls(colorWall, entryColor, exitColor)
+
+        #Ponemos el bot en una posicion especifica
+        self.bot.gotoSpecificFrame(frame=frame)
+
+        col = self.bot.getPos()[1]
+        numRows = (self.maze.getRowCol())[0]
+        row = (numRows - self.bot.getPos()[0] - 1)
+
+        # Lo dibujamos
+        self.bot.drawBot(row, col, self.bot.getOrientation(), self.cellSize, self.ax)
+        # Lo movemos de vuelva al inicio
+        self.bot.gotoSpecificFrame(frame=0)
+
+        # Mostramos el grafico
+        file = self.mediaFilename + "_frame" + str(frame) +".png"
+        plt.savefig(file)
+        plt.show()
+
+
+
+    def showMazeWithResolution(self, xkcd=True, colorWall="k", entryColor="palegreen" ,exitColor="lightcoral"):
+        """Generador del video de la animacion
+            Argumentos:
+                + xkcd (bool): Habilitar el estilo xkcd. Default:Habilitado
+                + colorWall (str): Color de las paredes del lab. (Default negro)
+                + entryColor (str): Color de la entrada. (Default palegreen)
+                + exitColor (str): Color de la salida. (Default lightcoral)
+        """
+        # Crea la figura y el estilo de los ejes
+        fig = self.configurePlot(xkcd=xkcd)
+
+        # Graficamos las paredes
+        self.plotWalls(colorWall, entryColor, exitColor)
+
+        for i in range(self.bot.getMaxFrame()):
+
+            col = self.bot.getPos()[1]
+            numRows = (self.maze.getRowCol())[0]
+            row = (numRows - self.bot.getPos()[0] - 1)
+
+            self.bot.drawBot(row, col, self.bot.getOrientation(), self.cellSize, self.ax)
+            self.bot.nextFrame()
+
+        # Mostramos el grafico
+        file = self.mediaFilename + "_resolution.png"
+        plt.savefig(file)
+        plt.show()
+
+        # Lo movemos de vuelva al inicio
+        self.bot.gotoSpecificFrame(frame=0)
 
     def plotWalls(self, colorWall="k", entryColor="palegreen" ,exitColor="lightcoral"):
         """ Grafica las paredes del laberinto
@@ -136,7 +214,7 @@ class Visualizer(object):
                 facecolor=exitColor)
         self.ax.add_patch(rectExit)
 
-    def configurePlot(self, createFigure=True, xkcd=True):
+    def configurePlot(self, xkcd=True):
         """Setea las configuraciones iniciales del plot. Ademas crea el plot y los ejes
             Argumentos:
                 + xkcd (bool): Habilitar un estilo xkcd(). Default:Enable
@@ -151,10 +229,7 @@ class Visualizer(object):
         else:
             plt.rcdefaults()
 
-        if (createFigure == True):
-            fig = plt.figure(figsize = (7, 7*numRows/numCol))
-        else:
-            fig = None
+        fig = plt.figure(figsize = (7, 7*numRows/numCol))
 
         # Create the axes
         self.ax = plt.axes()
@@ -167,9 +242,6 @@ class Visualizer(object):
         self.ax.axes.get_yaxis().set_visible(False)
 
         return fig
-
-
-
 
 class MazeForVisualization(object):
 
@@ -250,19 +322,24 @@ class BotForVisualization(object):
     Atributos: que lleva la visualización
 
         + path (2-D np.array): Estructura de numpy con el camino recorrido y las orientaciones del bot
+        + publicPath (2-D np.array): Estructura de numpy con el camino recorrido y las orientaciones del bot pero ya suavizado para animarse
         + pos (tuple): Tupla que guarda en que casillero del laberinto esta el robot
         + orientation (int): Orientacion que tiene el robot
-        + maxKeyframe (int): El ultimo paso del recorrido del robot.
-        + actualKeyframe (int): En que paso está el robot.
-
+        + _maxKeyframe (int): El ultimo paso del recorrido del robot.
+        + _actualKeyframe (int): En que paso está el robot.
+        + actualFrame (int): En que paso está el robot cuando recorre el camino smooth.
+        + maxFrame (int): El ultimo paso del recorrido del robot en el camino smooth.
     """
     def __init__(self):
 
-        self.path = None
+        self._path = None
+        self.publicPath = None
         self.pos = None
         self.orientation = None
-        self.maxKeyframe = None
-        self.actualKeyframe = None
+        self._maxKeyframe = None
+        self._actualKeyframe = None
+        self.actualFrame = None
+        self.maxFrame = None
 
     def loadPath(self, filename):
         """Metodo que carga el archivo con el camino recorrido por el bot.
@@ -281,30 +358,98 @@ class BotForVisualization(object):
             if row[2] > 3 or row[2] < 0:
                 noError = False
                 break
+            else:
+                if (row[2] == 0):
+                    row[2] = 0
+                elif(row[2] == 1):
+                    row[2] = 90
+                elif(row[2] == 2):
+                    row[2] = 180
+                else:
+                    row[2] = 270
 
         if (noError == True):
-            self.path = path
+            self._path = path
+            self.publicPath = self._path
             self.pos = (path[0][0], path[0][1])
             self.orientation = path[0][2]
-            self.maxKeyframe = len(path) - 1
-            self.actualKeyframe = 0
+            self._maxKeyframe = len(path) - 1
+            self._actualKeyframe = 0
+            self.maxFrame = self._maxKeyframe
+            self.actualFrame = self._actualKeyframe
             print("Camino recorrido del bot guardado correctamente")
         else:
-            self.path = None
+            self._path = None
             self.pos = None
             self.orientation = None
-            self.maxKeyframe = None
-            self.actualKeyframe = None
+            self._maxKeyframe = None
+            self._actualKeyframe = None
+            self.maxFrame = None
+            self.actualFrame = None
             print("El archivo de entrada no es un archivo valido")
 
-    def nextKeyframe(self):
-        """Metodo que modifica los datos del bots en posicion y orientacion.
+    def smoothingPath(self, frames=10):
+        """Metodo que obtiene el camino recorrido por el bot de forma suavizada
 
+            Argumentos:
+                + frames (int): Numero de cuadro entre los keyframes
         """
-        if (self.actualKeyframe < self.maxKeyframe):
-            self.actualKeyframe += 1
-            self.pos = (self.path[self.actualKeyframe][0], self.path[self.actualKeyframe][1])
-            self.orientation = self.path[self.actualKeyframe][2]
+        #Dejamos parado en la parte inicial del laberinto un rato al bot
+        smoothPath = np.tile(self._path[0], (frames, 1))
+
+        for index in range(self._maxKeyframe):
+            rowStart = self._path[index][0]*1.0
+            colStart = self._path[index][1]*1.0
+            orientationStart = self._path[index][2]*1.0
+            rowEnd = self._path[index+1][0]*1.0
+            colEnd = self._path[index+1][1]*1.0
+            orientationEnd = self._path[index+1][2]*1.0
+
+            #Realizamos un movimiento suave en el movimiento
+            rows = np.linspace(rowStart, rowEnd, num=frames)
+            cols = np.linspace(colStart, colEnd, num=frames)
+
+            #Para la orientacion hay que tener cuidado con el tema de angulos y
+            #como se hace para girar de izquierda a derecha o viceversa.
+            if (orientationStart - orientationEnd) == -270:
+                orientations = np.linspace(0, -90, num=frames)
+            elif (orientationStart - orientationEnd) == 270:
+                orientations = np.linspace(-90, 0, num=frames)
+            else:
+                orientations = np.linspace(orientationStart, orientationEnd, num=frames)
+
+            #Unimos todos los movimientos
+            union = np.array([rows, cols, orientations])
+            union = union.T
+
+            smoothPath = np.append(smoothPath, union, axis=0)
+
+        #Dejamos parado en la parte final del laberinto un rato al bot
+        ending = np.tile(self._path[-1], (2*frames, 1))
+
+        smoothPath = np.append(smoothPath, ending, axis=0)
+
+        self.publicPath = smoothPath
+        self.actualFrame = 0
+        self.maxFrame = len(smoothPath) - 1
+
+    def nextFrame(self):
+        """Metodo que modifica los datos del bots en posicion y orientacion usando los frames desde publicPath."""
+
+        if (self.actualFrame < self.maxFrame):
+            self.actualFrame += 1
+            self.pos = (self.publicPath[self.actualFrame][0], self.publicPath[self.actualFrame][1])
+            self.orientation = self.publicPath[self.actualFrame][2]
+
+    def gotoSpecificFrame(self, frame=0):
+        """Metodo que modifica los datos del bots en posicion y orientacion usando los frames desde publicPath.
+        en una posicion especifica.
+            Argumentos:
+                + frame (int): Que cuadro especifico se quiere ir
+        """
+        self.actualFrame = frame
+        self.pos = (self.publicPath[frame][0], self.publicPath[frame][1])
+        self.orientation = self.publicPath[frame][2]
 
     def getPos(self):
         """Metodo que devuelve la posicion del bot
@@ -316,29 +461,19 @@ class BotForVisualization(object):
         """Metodo que devuelve la orientacion del bot
 
         """
-        if (self.orientation == 0):
-            angle = 0
-        elif(self.orientation == 1):
-            angle = 90
-        elif(self.orientation == 2):
-            angle = 180
-        else:
-            angle = 270
+        return self.orientation
 
-        return angle
-
-    def getActualKeyframe(self):
-        """Metodo que devuelve en que keyframe está
+    def getActualFrame(self):
+        """Metodo que devuelve en que frame está
 
         """
-        return self.actualKeyframe
+        return self.actualFrame
 
-    def getMaxKeyframe(self):
+    def getMaxFrame(self):
         """Metodo que devuelve en cual es el ultimo keyframe
 
         """
-        return self.maxKeyframe
-
+        return self.maxFrame
 
 class RegularPolygonBot(BotForVisualization):
 
@@ -386,3 +521,17 @@ class RegularPolygonBot(BotForVisualization):
 
         self.drawing = polygon
         axes.add_patch(polygon)
+
+    def removeBot(self, axes):
+        """Metodo borra el bot
+            Argumentos:
+                + axes (matplotlib axes): Ejes donde se dibuja el bot
+        """
+        self.drawing.remove()
+
+    def changeColor(self, color):
+        """Metodo cambia color del bot
+            Argumentos:
+                + color (str): Color a cambiar
+        """
+        self.faceColor = color
