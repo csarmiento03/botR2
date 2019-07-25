@@ -21,7 +21,7 @@ def saveTrajectory(traj, fname):
 
 traj = []
 
-size = (4,4)
+size = (20,20)
 
 maze = mz.BacktrackingMaze(size)
 maze.buildMaze()
@@ -79,7 +79,7 @@ while solved == False:
         
         print("El robot ha salido del laberinto exitosamente !! :D")
 
-    if steps>=1000:
+    if steps>=10000:
 
         print("Me perdí !! Estoy perdido en la facultad de químicas")
         
@@ -87,8 +87,6 @@ while solved == False:
     
 print("Hice",steps,"pasos")
 #---------------------------------------------------------------------
-
-f.close()
 
 saveTrajectory(traj, "bb8.traj")
 
