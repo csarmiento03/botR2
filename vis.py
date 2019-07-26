@@ -543,3 +543,74 @@ class RegularPolygonBot(BotForVisualization):
                 + color (str): Color a cambiar
         """
         self.faceColor = color
+
+
+class BB8Bot(BotForVisualization):
+
+    """Clase dibuja el bot que recorre el camino de la simulacion con una forma de poligono regular
+
+    Atributos:
+
+        + Hereda los atributos de la clase padre BotForVisualization
+        + drawing (matplotlib.patches.RegularPolygon): Poligono regular de matplotlib (triangulo)
+        + numVertices (int): Numero de vertices que tiene el poligono
+        + faceColor (string): Color del poligono
+
+    """
+    def __init__(self):
+
+        self.drawing = None
+
+    def drawBot(self, row, col, angleRotation, cellSize, axes):
+        """Metodo dibuja a BB8 en una posicion.
+
+            Argumentos:
+                + row (int): Fila que nos indica en que fila esta el bot
+                + col (int): Fila que nos indica en que columna esta el bot
+                + angleRotation (int): No se usa
+                + cellSize (float): Tamaño de la celda a dibujar el robot
+                + axes (matplotlib axes): Ejes donde se dibuja el bot
+
+        """
+        x = (col + 0.5)*cellSize
+        y = (row + 0.5)*cellSize
+
+        #Dibujamos a BB8
+        head1 = mpatches.Wedge((0, 0.25), cellSize/5, 0, 180, color="orange")
+        head2 = mpatches.Circle((0, 0.4), radius=cellSize/16, color="black")
+        body1 =  mpatches.Circle((0, -0.25), radius=cellSize/4, color="orange")
+        body2 =  mpatches.Circle((0, -0.25), radius=cellSize/6, color="white")
+
+        #Movemos el poligono a la posicion indicada
+        t2 = mpl.transforms.Affine2D().translate(x, y)
+
+        #Unimos todas las transformaciones
+        tra = t2 + axes.transData
+        head1.set_transform(tra)
+        body1.set_transform(tra)
+        body2.set_transform(tra)
+        head2.set_transform(tra)
+
+        patches = []
+        patches.append(head1)
+        patches.append(body1)
+        patches.append(body2)
+        patches.append(head2)
+
+        self.drawing = patches
+
+        for parts in patches:
+            axes.add_patch(parts)
+
+    def removeBot(self, axes):
+        """Metodo borra el bot
+            Argumentos:
+                + axes (matplotlib axes): Ejes donde se dibuja el bot
+        """
+        for parts in self.drawing:
+            parts.remove()
+
+    def changeColor(self, color):
+        """Metodo cambia color del bot
+        """
+        pass
